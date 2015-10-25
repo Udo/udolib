@@ -134,7 +134,7 @@ This sets up a new WSBroker with `options`.
 
 `onClientMessage : function(message, connection, broker)` event handler that fires when a websockets client send a message.
 
-
+`backend : { type : 'http', url : '(my backend server URL)' }` set up WSBroker to use an upstream backend server.
 
 
 
