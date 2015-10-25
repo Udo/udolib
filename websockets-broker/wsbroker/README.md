@@ -34,7 +34,8 @@ parameters for initialization:
 var broker = new require('wsbroker').Broker({
   port : 12345,
   log : true,
-  });```
+  });
+```
   
 This will init a new Websockets server listening on port 12345, with
 debug logging to the console enabled. By default it will simply listen
