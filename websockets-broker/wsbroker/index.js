@@ -74,10 +74,15 @@ var backendCommands = {
   
   send : function(broker, connection, message) {
     var payload = JSON.stringify(message.message);
-    Lodash.forEach(broker.clients, function(connection) {
-      if(!message.match || match(message.match, connection.sessionInfo))
+    var recipients = [];
+    Lodash.forEach(broker.websocketServer.clients, function(connection) {
+      if(!message.match || match(message.match, connection.sessionInfo)) {
         connection.send(payload);
+        recipients.push(connection);
+      }
     });
+    if(broker.config.log)
+      console.log('← sent to '+(recipients.length)+'/'+(broker.websocketServer.clients.length)+' clients', message.message);
   },
   
 }
@@ -123,7 +128,7 @@ var onClientMessage = function(broker, connection, messageRaw) {
     console.log('→ from client', connection.sessionInfo.wskey, message);
   var dosendBackendMessage = true;
   if(broker.config.onClientMessage)
-    dosendBackendMessage = broker.config.onClientMessage(message, connection);
+    dosendBackendMessage = broker.config.onClientMessage(message, connection, broker);
   if(dosendBackendMessage) {
     if(!message.type || message.type.substr(0, 7) != 'client-')
       message.type = 'client-'+(message.type || 'message');
@@ -184,4 +189,9 @@ exports.Broker = function(config) {
   broker.onWSConnection = function(connection) { onWSConnection(broker, connection); };
   broker.onError = function(error) { onError(broker, error); }; 
   broker.websocketServer = initWebSocketServer(broker);
+  broker.broadcast = function(message, filter) { 
+    var command = { message : message };
+    if(filter) command.match = filter;
+    backendCommands.send(broker, null, command); };
+  broker.log = function(message) { backendCommands.log(broker, null, message); };
 }

@@ -49,10 +49,9 @@ broker:
 var broker = new require('wsbroker').Broker({
   port : 12345,
   log : true,
-  onClientMessage : function(message, connection) {
-    console.log('- MESSAGE RECEIVED!', message);
-    // send an answer:
-    connection.send(JSON.stringify({ 'type' : 42 }));
+  onClientMessage : function(message, connection, broker) {
+    console.log('MESSAGE RECEIVED!', message);
+    broker.broadcast(JSON.stringify(message));
   },
 });
 ```
@@ -63,7 +62,44 @@ something similar to this:
 
 ```
 ➥ websocket server listening on port 31002
-↪ new connection WpXdM1ydByUvmW4Vcriwrg== 28jg1m5ukf26ks4reinah80dngs2qk87eq8g73j93j89hckrnvh1
-→ from client WpXdM1ydByUvmW4Vcriwrg== { type: 'hello', content: 'there' }
-- MESSAGE RECEIVED! { type: 'hello', content: 'there' }
+↪ new connection 0aCw4LH5MR7bIacx5PtEtA== 28jg1m5ukf26ks4reinah80dngs2qk87eq8g73j93j89hckrnvh1
+→ from client 0aCw4LH5MR7bIacx5PtEtA== { type: 'hello', content: 'there' }
+MESSAGE RECEIVED! { type: 'hello', content: 'there' }
+← sent to 1/1 clients {"type":"hello","content":"there"}
 ```
+
+So we took a message from a client and re-broadcast it to all clients.
+Now instead of having `onClientMessage` take client messages, let's hook up a backend
+server:
+
+```javascript
+var broker = new require('wsbroker').Broker({
+  port : 12345,
+  log : true,
+  backend : {
+    type : 'http',
+    url : 'http://localhost/mybackend/',
+    }
+});
+```
+
+In this configuration, WSBroker will pass event notifications to
+the backend server every time a client connects, sends a message,
+or disconnects.
+
+The backend server receives these notifications in two POST parameters,
+`message` and `connection`:
+
+```PHP
+  $message = json_decode($_POST['message'], true);
+  $connection = json_decode($_POST['connection'], true);
+```
+
+`message` contains the actual message content. For connect notifications,
+the message.type field will be `session-connect`, for disconnects it will be
+`session-disconnect` and for all messages sent from the client, the broker
+will prepend `client-` to the message.type, for example `client-hello` if the
+message type was "hello".
+
+
+
