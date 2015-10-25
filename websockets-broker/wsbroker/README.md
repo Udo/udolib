@@ -110,5 +110,35 @@ the message.type field will be `session-connect`, for disconnects it will be
 will prepend `client-` to the message.type, for example `client-hello` if the
 message type was "hello".
 
+# WSBroker API Documentation
+
+## Setup
+
+```javascript
+require('wsbroker').Broker(options);
+```
+
+This sets up a new WSBroker with `options`.
+
+### Setup Options
+
+`log : true|false` Output debug log messages to the console.
+
+`port : (number)` mandatory. Set the port the websockets server listens to.
+
+`onBackendMessage : function(message, connection, broker)` event handler that fires when the backend sends a message to the broker.
+
+`onClientConnect : function(connection, broker)` event handler that fires when a websockets client connects.
+
+`onClientDisconnect : function(connection, broker)` event handler that fires when a websockets client disconnects.
+
+`onClientMessage : function(message, connection, broker)` event handler that fires when a websockets client send a message.
+
+
+
+
+
+
+
 
 

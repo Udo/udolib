@@ -34,7 +34,7 @@ var onWSClose = function(broker, connection) {
   if(broker.config.log)
     console.log('← connection closed', connection.sessionInfo.wskey);     
   if(broker.config.onClientDisconnect)
-    broker.config.onClientDisconnect(connection);
+    broker.config.onClientDisconnect(connection, broker);
   sendBackendMessage(broker, connection, { type : 'session-disconnect' });
 }
 
@@ -126,10 +126,10 @@ var onClientMessage = function(broker, connection, messageRaw) {
   message = safeParseJSON(messageRaw);
   if(broker.config.log)
     console.log('→ from client', connection.sessionInfo.wskey, message);
-  var dosendBackendMessage = true;
+  var doSendBackendMessage = true;
   if(broker.config.onClientMessage)
-    dosendBackendMessage = broker.config.onClientMessage(message, connection, broker);
-  if(dosendBackendMessage) {
+    doSendBackendMessage = broker.config.onClientMessage(message, connection, broker);
+  if(doSendBackendMessage) {
     if(!message.type || message.type.substr(0, 7) != 'client-')
       message.type = 'client-'+(message.type || 'message');
     sendBackendMessage(broker, connection, message);
@@ -155,10 +155,10 @@ var onWSConnection = function(broker, connection) {
       console.log('↪ new connection', connection.sessionInfo.wskey, connection.sessionInfo.session_id);     
     connection.on('message', function(message) { onClientMessage(broker, connection, message); });
     connection.on('close', function() { onWSClose(broker, connection); });
-    var dosendBackendMessage = true;
+    var doSendBackendMessage = true;
     if(broker.config.onClientConnect) 
-      dosendBackendMessage = broker.config.onConnection(connection);
-    if(dosendBackendMessage)
+      doSendBackendMessage = broker.config.onClientConnect(connection);
+    if(doSendBackendMessage)
       sendBackendMessage(broker, connection, { type : 'session-connect' });
   } catch (ee) {
     if(broker.config.log)
