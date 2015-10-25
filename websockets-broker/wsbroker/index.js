@@ -146,13 +146,12 @@ var onWSConnection = function(broker, connection) {
   try {
     connection.broker = broker;
     connection.cookieData = getCookies(connection);
-    connection.sessionInfo = {
-      session_id: connection.cookieData[broker.config.sessionCookieName],
+    connection.sessionInfo = Lodash.merge(connection.cookieData, {
       ip: connection.upgradeReq.headers['x-forwarded-for'],
       wskey: connection.upgradeReq.headers['sec-websocket-key'],
-      };
+      });
     if(broker.config.log)
-      console.log('↪ new connection', connection.sessionInfo.wskey, connection.sessionInfo.session_id);     
+      console.log('↪ new connection', connection.sessionInfo.wskey);     
     connection.on('message', function(message) { onClientMessage(broker, connection, message); });
     connection.on('close', function() { onWSClose(broker, connection); });
     var doSendBackendMessage = true;

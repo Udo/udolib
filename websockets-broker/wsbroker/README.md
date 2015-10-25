@@ -148,7 +148,60 @@ Optional. Output debug log messages to the console.
 
 ## Broker Fields
 
+####`config : (options)` 
+The options object passed into the WSBroker on creation.
 
+####`websocketServer : (object)` 
+Reference to the websockets server used by the broker.
+
+####`httpServer : (object)` 
+Reference to the HTTP server used by the broker.
+
+####`broadcast : function(message, [filterCriteria])` 
+Broadcasts the `message` to all connected clients. If `filterCriteria` is
+supplied, each client's `sessionInfo` object will be compared to it
+and only matching clients go get the message.
+
+## Connection sessionInfo
+
+### `sessionInfo` default values
+
+When WSBroker accepts a websocket connection from a client, it fills the
+`sessionInfo` object of that connection with the following fields:
+
+`ip` : from the connection's "x-forwarded-for" header
+`wskey` : a unique websockets connection key
+
+Also, all cookies sent by the client will be filled into the `sessionInfo` field
+automatically. `sessionInfo` is available in all API calls that give you
+a connection object.
+
+### Setting `sessionInfo` from the backend server
+
+Backend servers can send a `session` message as part of their response
+to a frontend event. If so, the `data` object of that message will become
+part of the connection's `sessionInfo`:
+
+```PHP
+$response[] = array(
+  'type' => 'session',
+  'data' => array(
+    'x' => 'y',
+    'time' => time(),
+    ),
+  );
+``` 
+
+This sets the fields `x` and `time` of the current connection's `sessionInfo` object.
+
+### Querying `sessionInfo`
+
+The broker.broadcast() function uses an optional parameter `filterCriteria`
+that can be used to broadcast a message only to matching connections.
+The following example will send a message only to clients with the
+pertinent `room` set to '42':
+
+broker.broadcast({ type : 'hello' }, { room : '42' });
 
 
 
