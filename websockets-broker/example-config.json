@@ -1,0 +1,17 @@
+{
+  "wsPort" : 31002,
+  "backendServer" : "http://direct.openfu.com/dev/udolib/websockets-broker/example-server/",
+  
+  "wsURL" : "ws://direct.openfu.com:31002/live/",
+  "sessionCookieName" : "session_id",
+  "internalCommandServer" : {
+    "host" : "127.0.0.1",
+    "port" : 21002
+    },
+  "internalAPI" : {
+    "url" : "http://direct.openfu.com/dev/udolib/websockets-broker/example-server/",
+    "headers" : {
+      "Content-Type": "application/x-www-form-urlencoded"
+      }
+    }
+  }

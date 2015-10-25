@@ -1,0 +1,25 @@
+{
+  "name": "WSBroker",
+  "version": "1.0.0",
+  "description": "A Websockets-to-backend connection broker",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Udo/WSBrokerBoilerplate"
+  },
+  "keywords": [
+    "websockets",
+    "ws",
+    "broker",
+    "backend"
+  ],
+  "author": "Udo Schroeter <udo.schroeter@gmail.com> (https://github.com/Udo)",
+  "license": "public domain",
+  "homepage": "https://github.com/Udo/WSBrokerBoilerplate",
+  "dependencies": {
+    "lodash": "^3.10.1",
+    "querystring": ">= 0.2.0",
+    "request": "^2.65.0",
+    "ws": ">= 0.6.0"
+  }
+}
