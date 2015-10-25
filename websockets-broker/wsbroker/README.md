@@ -122,19 +122,26 @@ This sets up a new WSBroker with `options`.
 
 ### Setup Options
 
-`log : true|false` Output debug log messages to the console.
+`log : true|false` 
+Output debug log messages to the console.
 
-`port : (number)` mandatory. Set the port the websockets server listens to.
+`port : (number)` 
+Mandatory. Set the port the websockets server listens to.
 
-`onBackendMessage : function(message, connection, broker)` event handler that fires when the backend sends a message to the broker.
+`onBackendMessage : function(message, connection, broker)` 
+Event handler that fires when the backend sends a message to the broker.
 
-`onClientConnect : function(connection, broker)` event handler that fires when a websockets client connects.
+`onClientConnect : function(connection, broker)` 
+Event handler that fires when a websockets client connects.
 
-`onClientDisconnect : function(connection, broker)` event handler that fires when a websockets client disconnects.
+`onClientDisconnect : function(connection, broker)` 
+Event handler that fires when a websockets client disconnects.
 
-`onClientMessage : function(message, connection, broker)` event handler that fires when a websockets client send a message.
+`onClientMessage : function(message, connection, broker)` 
+Event handler that fires when a websockets client send a message.
 
-`backend : { type : 'http', url : '(my backend server URL)' }` set up WSBroker to use an upstream backend server.
+`backend : { type : 'http', url : '(my backend server URL)' }` 
+Set up WSBroker to use an upstream backend server.
 
 
 
