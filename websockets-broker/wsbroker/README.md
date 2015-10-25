@@ -25,6 +25,8 @@ powerful allies.
 
 ## How to get started
 
+### Setting up a WSBroker
+
 To use the WSBroker component, either install with with `npm` or 
 save the file `wsbroker/index.js` manually next to your node app.
 You simply need to `require()` WSBroker and give it a few
@@ -40,6 +42,8 @@ var broker = new require('wsbroker').Broker({
 This will init a new Websockets server listening on port 12345, with
 debug logging to the console enabled. By default it will simply listen
 for new WS connections, accept them, and ignore any incoming messages.
+
+### Receiving messages from clients
 
 Let's hook up some functionality to it by supplying an `onClientMessage`
 handler that gets called every time the browser sends a message to the
@@ -68,7 +72,10 @@ MESSAGE RECEIVED! { type: 'hello', content: 'there' }
 ← sent to 1/1 clients {"type":"hello","content":"there"}
 ```
 
-So we took a message from a client and re-broadcast it to all clients.
+In this example, we took a message from a client and re-broadcast it to all clients.
+
+### Sending events to a backend server
+
 Now instead of having `onClientMessage` take client messages, let's hook up a backend
 server:
 
@@ -86,6 +93,8 @@ var broker = new require('wsbroker').Broker({
 In this configuration, WSBroker will pass event notifications to
 the backend server every time a client connects, sends a message,
 or disconnects.
+
+### Interpreting requests on the backend server
 
 The backend server receives these notifications in two POST parameters,
 `message` and `connection`:
