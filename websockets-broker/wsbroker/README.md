@@ -34,7 +34,7 @@ parameters for initialization:
 var broker = new require('wsbroker').Broker({
   port : 12345,
   log : true,
-  });
+});
 ```
   
 This will init a new Websockets server listening on port 12345, with
@@ -54,7 +54,7 @@ var broker = new require('wsbroker').Broker({
     // send an answer:
     connection.send(JSON.stringify({ 'type' : 42 }));
   },
-  });
+});
 ```
 
 For example, if you're using the test client provided in the repository
