@@ -170,6 +170,7 @@ When WSBroker accepts a websocket connection from a client, it fills the
 `sessionInfo` object of that connection with the following fields:
 
 `ip` : from the connection's "x-forwarded-for" header
+
 `wskey` : a unique websockets connection key
 
 Also, all cookies sent by the client will be filled into the `sessionInfo` field
@@ -201,8 +202,9 @@ that can be used to broadcast a message only to matching connections.
 The following example will send a message only to clients with the
 pertinent `room` set to '42':
 
-broker.broadcast({ type : 'hello' }, { room : '42' });
-
+```javascript
+  broker.broadcast({ type : 'hello' }, { room : '42' });
+```
 
 
 
