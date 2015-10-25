@@ -8,6 +8,9 @@ between clients and a backend. The broker can talk to an
 HTTP-based backend by exchanging JSON messages, or you can
 implement an arbitrary backend logic right there in Node. 
 
+Feel free to contact me at udo.schroeter@gmail.com for
+questions and comments.
+
 ## Why use it?
 
 I developed WSBroker as a component for realtime web applications,
@@ -218,7 +221,7 @@ both of which are JSON-encoded.
 `connection` contains the `sessionInfo` data of the connection that
 caused the event.
 
-### Responding to notifications
+### Responding to Notifications
 
 The backend server can optionally send a JSON-encoded list of broker
 commands back to the broker as a response to an event notification.
