@@ -172,8 +172,13 @@ var onError = function(broker, error) {
 }
 
 var initWebSocketServer = function(broker) {
+  if(!broker.config.server)
+    broker.httpServer = Http.createServer();
+  else  
+    broker.httpServer = broker.config.server;
   var wsrv = new WebSocketServer({
-    port: broker.config.port,
+    server : broker.httpServer,
+    port : broker.config.port,
     });  
   wsrv.on('connection', broker.onWSConnection);
   wsrv.on('error', broker.onError);
