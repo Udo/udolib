@@ -41,3 +41,29 @@ This will init a new Websockets server listening on port 12345, with
 debug logging to the console enabled. By default it will simply listen
 for new WS connections, accept them, and ignore any incoming messages.
 
+Let's hook up some functionality to it by supplying an `onClientMessage`
+handler that gets called every time the browser sends a message to the
+broker:
+
+```javascript
+var broker = new require('wsbroker').Broker({
+  port : 12345,
+  log : true,
+  onClientMessage : function(message, connection) {
+    console.log('- MESSAGE RECEIVED!', message);
+    // send an answer:
+    connection.send(JSON.stringify({ 'type' : 42 }));
+  },
+  });
+```
+
+For example, if you're using the test client provided in the repository
+(`example-client-page.php`), you should then see your Node process outputting
+something similar to this:
+
+```
+➥ websocket server listening on port 31002
+↪ new connection WpXdM1ydByUvmW4Vcriwrg== 28jg1m5ukf26ks4reinah80dngs2qk87eq8g73j93j89hckrnvh1
+→ from client WpXdM1ydByUvmW4Vcriwrg== { type: 'hello', content: 'there' }
+- MESSAGE RECEIVED! { type: 'hello', content: 'there' }
+```
