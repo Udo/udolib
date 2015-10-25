@@ -25,3 +25,18 @@ powerful allies.
 
 ## How to get started
 
+To use the WSBroker component, either install with with `npm` or 
+save the file `wsbroker/index.js` manually next to your node app.
+You simply need to `require()` WSBroker and give it a few
+parameters for initialization:
+
+```javascript
+var broker = new require('wsbroker').Broker({
+  port : 12345,
+  log : true,
+  });```
+  
+This will init a new Websockets server listening on port 12345, with
+debug logging to the console enabled. By default it will simply listen
+for new WS connections, accept them, and ignore any incoming messages.
+
