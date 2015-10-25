@@ -206,6 +206,57 @@ pertinent `room` set to '42':
   broker.broadcast({ type : 'hello' }, { room : '42' });
 ```
 
+## Backend Server Communication
+
+The backend server will receive a notification every time a client 
+connects, sends a message, or disconnects. The data is passed to the
+backend server in two HTTP POST fields: `message` and `connection`,
+both of which are JSON-encoded.
+
+`message` contains the actual message that was sent by the client.
+
+`connection` contains the `sessionInfo` data of the connection that
+caused the event.
+
+### Responding to notifications
+
+The backend server can optionally send a JSON-encoded list of broker
+commands back to the broker as a response to an event notification.
+
+For example, the following example will cause the broker to output
+a log message to the console, as instructed by the backend server:
+
+```PHP
+print(json_encode(array(
+  array('type' => 'log', 'text' => 'Something happened on the backend!'),
+  )));
+```
+The backend server can respond with any valid broker command. If the
+type of the command is not understood by the broker, it will trigger the
+`broker.config.onBackendMessage()` event handler if present. Using this
+command hook, the broker's command functionality can be extended.
+
+### Sending commands
+
+In addition to sending commands in its response to events, the backend
+server may also contact the broker directly and send it a list of commands.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
