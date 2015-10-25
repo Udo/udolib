@@ -165,6 +165,29 @@ var onWSConnection = function(broker, connection) {
   }
 }
 
+var onCommandRequest = function(broker, request, response) {
+  if (request.method == 'POST') {
+    var body = '';
+    request.on('data', function (data) {
+        body += data;
+    });
+    request.on('end', function () {
+      response.writeHead(200, {'Content-Type': 'text/html'});
+      // todo: obviously, this only works with url encoded form data
+      var params = querystring.parse(body);
+      var data = {};
+      if(params.data) data = safeParseJSON(params.data);
+      if(data.length > 0)
+        onBackendMessage(broker, null, data);
+      response.end();
+    });
+  }
+  else {
+    response.writeHead(200, {'Content-Type': 'text/html'});
+    response.end(html);
+  }
+}
+
 var onError = function(broker, error) {
   if(broker.config.log)
     console.log('! Error', error);
@@ -181,6 +204,8 @@ var initWebSocketServer = function(broker) {
     });  
   wsrv.on('connection', broker.onWSConnection);
   wsrv.on('error', broker.onError);
+  broker.httpServer.on('request', function(request, response) { 
+    onCommandRequest(broker, request, response); });
   if(broker.config.log)
     console.log('➥ websocket server listening on port ' + broker.config.port);
   return(wsrv);
@@ -192,10 +217,10 @@ exports.Broker = function(config) {
   if(!config.backendCommands) config.backendCommands = {};
   broker.onWSConnection = function(connection) { onWSConnection(broker, connection); };
   broker.onError = function(error) { onError(broker, error); }; 
-  broker.websocketServer = initWebSocketServer(broker);
   broker.broadcast = function(message, filter) { 
     var command = { message : message };
     if(filter) command.match = filter;
     backendCommands.send(broker, null, command); };
   broker.log = function(message) { backendCommands.log(broker, null, message); };
+  broker.websocketServer = initWebSocketServer(broker); 
 }
