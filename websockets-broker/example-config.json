@@ -1,4 +1,0 @@
-{
-  "wsPort" : 31002,
-  "backendServer" : "http://direct.openfu.com/dev/udolib/websockets-broker/example-server/"
-}
