@@ -94,6 +94,8 @@ return a function.
 
 ## endsWith($s, $match)
 
+Checks whether the string `$s` ends with `$match`.
+
 ```PHP
 print( endsWith('hello world', 'world') );
 ```
@@ -105,6 +107,11 @@ Output:
 ```
 
 ## first(...)
+
+Returns the first of its arguments that is not
+null, false, or an empty string. You can use this
+with the @ prefix to silence notices about uninitialized
+variables.
 
 ```PHP
 print( @first($_REQUEST['test'], 'default value') );
@@ -203,6 +210,8 @@ Output:
 ```
 
 ## startsWith($s, $match)
+
+Checks whether the string `$s` starts with `$match`.
 
 ```PHP
 print( startsWith('hello world', 'hello') );
