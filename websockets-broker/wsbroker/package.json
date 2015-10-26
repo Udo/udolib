@@ -1,6 +1,6 @@
 {
   "name": "wsbroker",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "A Websockets-to-backend connection broker",
   "main": "index.js",
   "repository": {
@@ -15,7 +15,7 @@
   ],
   "author": "Udo Schroeter <udo.schroeter@gmail.com> (https://github.com/Udo)",
   "license": "public domain",
-  "homepage": "https://github.com/Udo/WSBrokerBoilerplate",
+  "homepage": "https://github.com/Udo/udolib",
   "dependencies": {
     "lodash": "^3.10.1",
     "request": "^2.65.0",
