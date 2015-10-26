@@ -40,6 +40,7 @@ Output:
 
 ## capitalize($name)
 
+Capitalizes the first letter of the given string.
 
 
 ```PHP
@@ -53,6 +54,21 @@ Hello there.
 ```
 
 ## element($name, ...)
+
+A way to do simple templates with building blocks in your app. `element()` will look up a file
+called `$name.'.php'` and execute it. That file must return a function. This function will
+then be called every time element() is invoked with that same name. Additional parameters
+to the `element()` call will be passed along to that function.
+
+A very simple element file might look like this:
+```
+<?php return(function($title) {
+  ?><h2><?= $title ?></h2><?
+});
+```
+
+Here's ahow the element is being used:
+
 
 ```PHP
 element('example-element', 'Hello World');
