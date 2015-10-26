@@ -290,6 +290,10 @@ list only contains a single message.
 
 The following is a list of built-in broker commands.
 
+####`{ type : 'log', text : '(log message') }`
+Causes the broker to log `text` to its output log.
+
+
 
 
 
