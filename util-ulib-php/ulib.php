@@ -167,7 +167,7 @@ function element($name)
   if(!isset($GLOBALS['elementCache'][$name]))
   {
     if(isset($GLOBALS['elementLocator']))
-      $GLOBALS['elementCache'][$name] = $GLOBALS['elementLocator']($name);
+      $GLOBALS['elementCache'][$name] = $GLOBALS['elementLoader']($name);
     else
       $GLOBALS['elementCache'][$name] = require(@first($GLOBALS['elementDir'], '').$name.'.php');
   }
