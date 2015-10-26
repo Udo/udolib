@@ -23,4 +23,29 @@ ulib is released into the public domain.
 
 # ulib Functions
 
+## ageToString($unixDate, $new = 'just now', $ago = 'ago')
+
+## capitalize($name)
+
+## element($name)
+
+## endsWith($s, $match)
+
+## first()
+
+## map($list, $func)
+
+## match($subject, $criteria)
+
+## nibble($delim, $cake)
+
+## parseRequestURI($uri = $_SERVER['REQUEST_URI'])
+
+## reduce($list, $func)
+
+## startsWith($s, $match)
+
+## truncate($s, $maxLength, $indicator = '')
+
+## writeToFile($fileName, $content)
 

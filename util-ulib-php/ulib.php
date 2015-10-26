@@ -3,7 +3,7 @@
 # **************************** GENERAL UTILITY FUNCTIONS ******************************
 
 # if $def1 is empty, use $def2
-function first($def1, $def2 = '', $zero_ok = false)
+function first()
 {
   $args = func_get_args();
   foreach($args as $v)
