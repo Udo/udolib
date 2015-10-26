@@ -252,6 +252,10 @@ type of the command is not understood by the broker, it will trigger the
 `broker.config.onBackendMessage()` event handler if present. Using this
 command hook, the broker's command functionality can be extended.
 
+*Gotcha*: when sending a command response back to the broker, remember
+it expects a list of command messages (see example), even if that
+list only contains a single message.
+
 ### Sending commands
 
 In addition to sending commands in its response to events, the backend
@@ -262,18 +266,21 @@ In order for the broker to accept the command, the backend server's
 IP address must be given in the `allow` list of the `backend` option (see there).
 Usually, this will be '127.0.0.1'.
 
-Here is an example of a PHP app sending a command to the broker:
+Here is an example of a PHP app sending a command to the broker,
+retrieving a list of all current connections:
 
 ```PHP
-  $data[] = array(
-      'type' => 'log',
-      'text' => 'THIS IS A COMMAND TEST',
-      );
+$data[] = array(
+    'type' => 'list',
+    );
 
-  print_r(httpRequest('http://localhost:'.$config['wsPort'].'/', array(
-    'data' => json_encode($data))));
+print_r(httpRequest('http://localhost:'.$config['wsPort'].'/', array(
+  'data' => json_encode($data))));
 ```
 
+*Gotcha*: when sending a command the broker, remember
+it expects a list of command messages (see example), even if that
+list only contains a single message.
 
 
 

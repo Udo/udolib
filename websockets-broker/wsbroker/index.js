@@ -68,8 +68,14 @@ var backendCommands = {
   },
   
   close : function(broker, connection, message) {
-    if(connection)
+    if(connection && !message.match)
       connection.close();
+    if(message.match)
+      Lodash.forEach(broker.websocketServer.clients, function(connection) {
+        if(!message.match || match(message.match, connection.sessionInfo)) {
+          connection.close();
+        }
+      });
   },
   
   send : function(broker, connection, message) {
@@ -85,22 +91,34 @@ var backendCommands = {
       console.log('← sent to '+(recipients.length)+'/'+(broker.websocketServer.clients.length)+' clients', message.message);
   },
   
+  list : function(broker, connection, message) {
+    var result = [];
+    Lodash.forEach(broker.websocketServer.clients, function(connection) {
+      if(!message.match || match(message.match, connection.sessionInfo)) {
+        result.push(connection.sessionInfo);
+      }
+    });
+    return(result);
+  },
+  
 }
 
 var onBackendMessage = function(broker, connection, message) {
+  var result = [];
   if(message.length > 0)
     Lodash.forEach(message, function(cmd, key) {
       if(broker.config.log)
         console.log('↓ from backend', cmd);
       if(broker.config.backendCommands[cmd.type])
-        broker.config.backendCommands[cmd.type](cmd, connection, broker);
+        result.push(broker.config.backendCommands[cmd.type](cmd, connection, broker));
       else if(backendCommands[cmd.type])
-        backendCommands[cmd.type](broker, connection, cmd);
+        result.push(backendCommands[cmd.type](broker, connection, cmd));
       else if(broker.config.onBackendMessage)
-        broker.config.onBackendMessage(cmd, connection, broker);
+        result.push(broker.config.onBackendMessage(cmd, connection, broker));
       else if(broker.config.log)
-        console.log('! unknown backend command', cmd);
+        result.push(console.log('! unknown backend command', cmd));
     });
+  return(result);
 }
 
 var sendBackendMessage = function(broker, connection, message, whenDone) {
@@ -182,8 +200,8 @@ var onCommandRequest = function(broker, request, response) {
         var data = {};
         if(params.data) data = safeParseJSON(params.data);
         if(data.length > 0)
-          onBackendMessage(broker, null, data);
-        response.end('OK');
+          response.write(JSON.stringify(onBackendMessage(broker, null, data)));
+        response.end();
       }
     });
   }
