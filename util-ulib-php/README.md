@@ -40,25 +40,170 @@ Output:
 
 ## capitalize($name)
 
+
+
+```PHP
+print( capitalize('hello there.') );
+```
+
+Output:
+
+```
+Hello there.
+```
+
 ## element($name, ...)
+
+```PHP
+element('example-element', 'Hello World');
+```
+
+Output:
+
+```
+<h2>Hello World</h2>
+```
 
 ## endsWith($s, $match)
 
+```PHP
+print( endsWith('hello world', 'world') );
+```
+
+Output:
+
+```
+1
+```
+
 ## first(...)
+
+```PHP
+print( @first($_REQUEST['test'], 'default value') );
+```
+
+Output:
+
+```
+default value
+```
 
 ## map($list, $func)
 
+```PHP
+$list = array(1, 2, 3, 4, 5);
+# put even entries in new list
+print_r( map($list, function($item) {
+  if($item % 2 == 0) return($item);
+  }) );
+```
+
+Output:
+
+```
+Array
+(
+    [0] => 2
+    [1] => 4
+)
+```
+
 ## match($subject, $criteria)
+
+
+```PHP
+$person = array('name' => 'Jon', 'family' => 'Doe', 'age' => '21');
+print( match($person, array('family' => 'Doe')) );
+```
+
+Output:
+
+```
+1
+```
 
 ## nibble($delim, $cake)
 
+```PHP
+$myString = 'answer=42';
+print( nibble('=', $myString).chr(10) );
+print( 'equals '.$myString );
+```
+
+Output:
+
+```
+answer
+equals 42
+```
+
 ## parseRequestURI($uri = $_SERVER['REQUEST_URI'])
+
+```PHP
+print_r( parseRequestURI() );
+```
+
+Output:
+
+```
+Array
+(
+    [path] => dev/udolib/util-ulib-php/example-demo.php
+    [query] => Array
+        (
+        )
+
+    [path2] => bla
+)
+```
 
 ## reduce($list, $func)
 
+```PHP
+$list = array(1, 2, 3, 4, 5);
+# sum of all even entries
+print( reduce($list, function($total, $item) {
+  if($item % 2 == 0) return($total+$item);
+  }) );
+```
+
+Output:
+
+
+```
+6
+```
+
 ## startsWith($s, $match)
+
+```PHP
+print( startsWith('hello world', 'hello') );
+```
+
+Output:
+```
+1
+```
 
 ## truncate($s, $maxLength, $indicator = '')
 
+```PHP
+print( truncate('hello world', 5, '…') );
+```
+
+Output:
+```
+hello…
+```
+
 ## writeToFile($fileName, $content)
+
+```PHP
+
+```
+
+Output:
+```
+
+```
 
