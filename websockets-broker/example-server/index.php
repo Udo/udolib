@@ -8,10 +8,6 @@
 
   header('Content-type: text/plain; charset=utf-8');
   
-  include('lib/http.request.php');
-  include('lib/broker.request.php');
-  $GLOBALS['config'] = json_decode(file_get_contents('../example-config.json'), true);
-
   $message = json_decode($_POST['message'], true);
   $connection = json_decode($_POST['connection'], true);
   

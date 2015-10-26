@@ -88,6 +88,7 @@ var broker = new require('wsbroker').Broker({
   log : true,
   backend : {
     type : 'http',
+    allow : [ '127.0.0.1' ],
     url : 'http://localhost/mybackend/',
     }
 });
@@ -96,6 +97,12 @@ var broker = new require('wsbroker').Broker({
 In this configuration, WSBroker will pass event notifications to
 the backend server every time a client connects, sends a message,
 or disconnects.
+
+The `allow` array indicates a list of IP addresses that are allowed to
+issue commands via HTTP POST to the broker listening on the Websockets
+port. If this parameter is omitted, all command sent will be rejected,
+however, event notifications will still be sent to the backend server
+(and commands sent as responses will still be evaluated).
 
 ### Interpreting requests on the backend server
 
@@ -140,8 +147,14 @@ Optional. Event handler that fires when a websockets client disconnects.
 ####`onClientMessage : function(message, connection, broker)` 
 Optional. Event handler that fires when a websockets client send a message.
 
-####`backend : { type : 'http', url : '(my backend server URL)' }` 
-Optional. Set up WSBroker to use an upstream backend server.
+####`backend : { type : 'http', url : '(my backend server URL)', allow : ['127.0.0.1'] }` 
+Optional. Set up WSBroker to use an upstream backend server. The `allow` array 
+indicates a list of IP addresses that are allowed to
+issue commands via HTTP POST to the broker listening on the Websockets
+port. If this parameter is omitted, all command sent will be rejected,
+however, event notifications will still be sent to the backend server
+(and commands sent as responses will still be evaluated).
+
 
 ####`server : require('http').createServer()` 
 Optional. Use this instance of httpServer to create the Websockets server.
@@ -242,8 +255,24 @@ command hook, the broker's command functionality can be extended.
 ### Sending commands
 
 In addition to sending commands in its response to events, the backend
-server may also contact the broker directly and send it a list of commands.
+server may also contact the broker directly and send it a list of commands
+in form of an HTTP POST request sent to the broker's websocket port.
 
+In order for the broker to accept the command, the backend server's
+IP address must be given in the `allow` list of the `backend` option (see there).
+Usually, this will be '127.0.0.1'.
+
+Here is an example of a PHP app sending a command to the broker:
+
+```PHP
+  $data[] = array(
+      'type' => 'log',
+      'text' => 'THIS IS A COMMAND TEST',
+      );
+
+  print_r(httpRequest('http://localhost:'.$config['wsPort'].'/', array(
+    'data' => json_encode($data))));
+```
 
 
 

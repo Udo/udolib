@@ -7,6 +7,7 @@ var broker = new require('./wsbroker').Broker({
   log : true,
   backend : {
     type : 'http',
+    allow : [ '127.0.0.1' ],
     url : cfg.backendServer,
     }
   });

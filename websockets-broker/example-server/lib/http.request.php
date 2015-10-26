@@ -11,9 +11,10 @@ function httpRequest($url, $post = array(), $opt = array())
   // this is a workaround for a parameter bug that prevents params starting with an @ from working correctly
   foreach($post as $k => $v) if(substr($v, 0, 1) == '@') $post[$k] = '\\'.$v;
 
-  if(sizeof($post)>0) curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+  if(sizeof($post)>0) 
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post));
   curl_setopt($ch, CURLOPT_HEADER, 1);  
-  curl_setopt($ch, CURLOPT_TIMEOUT, $opt['timeout'] ? $opt['timeout'] : 2); 
+  @curl_setopt($ch, CURLOPT_TIMEOUT, $opt['timeout'] ? $opt['timeout'] : 2); 
   curl_setopt($ch, CURLOPT_RETURNTRANSFER  ,1);  
   $result = curl_exec($ch);
   curl_close($ch);

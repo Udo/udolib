@@ -1,6 +1,9 @@
 <html><?php
 
 $cfg = json_decode(file_get_contents('example-config.json'), true);
+
+$cfg['wsURL'] = 'ws://'.$_SERVER['HTTP_HOST'].':'.$cfg['wsPort'];
+
 header('Content-type: text/html; charset=utf-8');
 session_name('session_id');
 session_start();

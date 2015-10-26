@@ -174,12 +174,17 @@ var onCommandRequest = function(broker, request, response) {
     request.on('end', function () {
       response.writeHead(200, {'Content-Type': 'text/html'});
       // todo: obviously, this only works with url encoded form data
-      var params = querystring.parse(body);
-      var data = {};
-      if(params.data) data = safeParseJSON(params.data);
-      if(data.length > 0)
-        onBackendMessage(broker, null, data);
-      response.end();
+      var address = request.connection.remoteAddress;
+      if(!broker.config.backend || !broker.config.backend.allow || broker.config.backend.allow.indexOf(address) == -1) {
+        response.end('access denied');
+      } else {
+        var params = QueryString.parse(body);
+        var data = {};
+        if(params.data) data = safeParseJSON(params.data);
+        if(data.length > 0)
+          onBackendMessage(broker, null, data);
+        response.end('OK');
+      }
     });
   }
   else {
@@ -200,14 +205,15 @@ var initWebSocketServer = function(broker) {
     broker.httpServer = broker.config.server;
   var wsrv = new WebSocketServer({
     server : broker.httpServer,
-    port : broker.config.port,
     });  
   wsrv.on('connection', broker.onWSConnection);
   wsrv.on('error', broker.onError);
   broker.httpServer.on('request', function(request, response) { 
     onCommandRequest(broker, request, response); });
-  if(broker.config.log)
-    console.log('➥ websocket server listening on port ' + broker.config.port);
+  broker.httpServer.listen(broker.config.port, function() {
+    if(broker.config.log)
+      console.log('➥ websocket server listening on port ' + broker.config.port);
+    });
   return(wsrv);
 }
 
