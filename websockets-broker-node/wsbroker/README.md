@@ -132,22 +132,8 @@ This sets up a new WSBroker with `options`.
 
 ### Setup Options
 
-####`port : (number)` 
-Mandatory. Set the port the websockets server listens to.
+`backend : { type : 'http', url : '(my backend server URL)', allow : ['127.0.0.1'] }` 
 
-####`onBackendMessage : function(message, connection, broker)` 
-Optional. Event handler that fires when the backend sends a message to the broker.
-
-####`onClientConnect : function(connection, broker)` 
-Optional. Event handler that fires when a websockets client connects.
-
-####`onClientDisconnect : function(connection, broker)` 
-Optional. Event handler that fires when a websockets client disconnects.
-
-####`onClientMessage : function(message, connection, broker)` 
-Optional. Event handler that fires when a websockets client send a message.
-
-####`backend : { type : 'http', url : '(my backend server URL)', allow : ['127.0.0.1'] }` 
 Optional. Set up WSBroker to use an upstream backend server. The `allow` array 
 indicates a list of IP addresses that are allowed to
 issue commands via HTTP POST to the broker listening on the Websockets
@@ -155,12 +141,33 @@ port. If this parameter is omitted, all command sent will be rejected,
 however, event notifications will still be sent to the backend server
 (and commands sent as responses will still be evaluated).
 
+`log : true|false` 
 
-####`server : require('http').createServer()` 
-Optional. Use this instance of httpServer to create the Websockets server.
-
-####`log : true|false` 
 Optional. Output debug log messages to the console.
+
+`onBackendMessage : function(message, connection, broker)` 
+
+Optional. Event handler that fires when the backend sends a message to the broker.
+
+`onClientConnect : function(connection, broker)` 
+
+Optional. Event handler that fires when a websockets client connects.
+
+`onClientDisconnect : function(connection, broker)` 
+
+Optional. Event handler that fires when a websockets client disconnects.
+
+`onClientMessage : function(message, connection, broker)` 
+
+Optional. Event handler that fires when a websockets client send a message.
+
+`port : (number)` 
+
+Mandatory. Set the port the websockets server listens to.
+
+`server : require('http').createServer()` 
+
+Optional. Use this instance of httpServer to create the Websockets server.
 
 ## Broker Fields
 
@@ -290,7 +297,8 @@ list only contains a single message.
 
 The following is a list of built-in broker commands.
 
-####`{ type : 'close' [, match : {criteria}] }`
+`{ type : 'close' [, match : {criteria}] }`
+
 Closes active connections. 
 
 If sent without the optional match
@@ -300,16 +308,19 @@ this will close the active connection that initiated the event.
 If used with the optional match object, all connections with a 
 matching `sessionInfo` will be terminated.
 
-####`{ type : 'list' [, match : {criteria}]  }`
+`{ type : 'list' [, match : {criteria}]  }`
+
 Retrieves a list of currently active connections.
 
 If used with the optional match object, all connections with a 
 matching `sessionInfo` will be returned.
 
-####`{ type : 'log', text : '(log message') }`
+`{ type : 'log', text : '(log message') }`
+
 Causes the broker to log `text` to its output log.
 
-####`{ type : 'send', message : {message} [, match : {criteria}] }`
+`{ type : 'send', message : {message} [, match : {criteria}] }`
+
 Passes `message` through to the client.
 
 If sent without the optional match
@@ -320,7 +331,8 @@ initiated the event.
 If used with the optional match object, all connections with a 
 matching `sessionInfo` will receive the message.
 
-####`{ type : 'session', data : {session} [, match : {criteria}] }`
+`{ type : 'session', data : {session} [, match : {criteria}] }`
+
 Sets `sessionInfo` fields of connections.
 
 If sent without the optional match
