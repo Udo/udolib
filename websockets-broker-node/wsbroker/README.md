@@ -30,6 +30,10 @@ powerful allies.
 
 ### Setting up a WSBroker
 
+```
+npm install --save wsbroker
+```
+
 To use the WSBroker component, either install with with `npm` or 
 save the file `wsbroker/index.js` manually next to your node app.
 You simply need to `require()` WSBroker and give it a few
