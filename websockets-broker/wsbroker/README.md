@@ -239,6 +239,8 @@ caused the event.
 The backend server can optionally send a JSON-encoded list of broker
 commands back to the broker as a response to an event notification.
 
+See "Broker Commands" for a list of built-in commands.
+
 For example, the following example will cause the broker to output
 a log message to the console, as instructed by the backend server:
 
@@ -262,6 +264,8 @@ In addition to sending commands in its response to events, the backend
 server may also contact the broker directly and send it a list of commands
 in form of an HTTP POST request sent to the broker's websocket port.
 
+See "Broker Commands" for a list of built-in commands.
+
 In order for the broker to accept the command, the backend server's
 IP address must be given in the `allow` list of the `backend` option (see there).
 Usually, this will be '127.0.0.1'.
@@ -281,6 +285,10 @@ print_r(httpRequest('http://localhost:'.$config['wsPort'].'/', array(
 *Gotcha*: when sending a command the broker, remember
 it expects a list of command messages (see example), even if that
 list only contains a single message.
+
+## Broker Commands
+
+The following is a list of built-in broker commands.
 
 
 
