@@ -81,10 +81,10 @@ var backendCommands = {
   send : function(broker, connection, message) {
     var payload = JSON.stringify(message.message);
     var recipients = [];
-    Lodash.forEach(broker.websocketServer.clients, function(connection) {
+    Lodash.forEach(broker.websocketServer.clients, function(client) {
       if(!message.match || match(message.match, connection.sessionInfo)) {
-        connection.send(payload);
-        recipients.push(connection);
+        sendClientMessage(broker, client, payload, true);
+        recipients.push(client);
       }
     });
     if(broker.config.log)
@@ -154,10 +154,13 @@ var onClientMessage = function(broker, connection, messageRaw) {
   }
 }
 
-var sendClientMessage = function(broker, connection, message) {
-  connection.send(JSON.stringify(message));
-  if(broker.config.log)
-    console.log('← to client', connection.sessionInfo.wskey, message);
+var sendClientMessage = function(broker, connection, message, noLog) {
+  try {
+    if(typeof message != 'string') message = JSON.stringify(message);
+    connection.send(message);
+    if(broker.config.log && !noLog)
+      console.log('← to client', connection.sessionInfo.wskey, message);
+  } catch (ee) {}
 }
 
 var onWSConnection = function(broker, connection) {
