@@ -132,22 +132,22 @@ This sets up a new WSBroker with `options`.
 
 ### Setup Options
 
-####`port : (number)` 
+#####`port : (number)` 
 Mandatory. Set the port the websockets server listens to.
 
-####`onBackendMessage : function(message, connection, broker)` 
+#####`onBackendMessage : function(message, connection, broker)` 
 Optional. Event handler that fires when the backend sends a message to the broker.
 
-####`onClientConnect : function(connection, broker)` 
+#####`onClientConnect : function(connection, broker)` 
 Optional. Event handler that fires when a websockets client connects.
 
-####`onClientDisconnect : function(connection, broker)` 
+#####`onClientDisconnect : function(connection, broker)` 
 Optional. Event handler that fires when a websockets client disconnects.
 
-####`onClientMessage : function(message, connection, broker)` 
+#####`onClientMessage : function(message, connection, broker)` 
 Optional. Event handler that fires when a websockets client send a message.
 
-####`backend : { type : 'http', url : '(my backend server URL)', allow : ['127.0.0.1'] }` 
+#####`backend : { type : 'http', url : '(my backend server URL)', allow : ['127.0.0.1'] }` 
 Optional. Set up WSBroker to use an upstream backend server. The `allow` array 
 indicates a list of IP addresses that are allowed to
 issue commands via HTTP POST to the broker listening on the Websockets
@@ -156,24 +156,24 @@ however, event notifications will still be sent to the backend server
 (and commands sent as responses will still be evaluated).
 
 
-####`server : require('http').createServer()` 
+#####`server : require('http').createServer()` 
 Optional. Use this instance of httpServer to create the Websockets server.
 
-####`log : true|false` 
+#####`log : true|false` 
 Optional. Output debug log messages to the console.
 
 ## Broker Fields
 
-####`config : (options)` 
+#####`config : (options)` 
 The options object passed into the WSBroker on creation.
 
-####`websocketServer : (object)` 
+#####`websocketServer : (object)` 
 Reference to the websockets server used by the broker.
 
-####`httpServer : (object)` 
+#####`httpServer : (object)` 
 Reference to the HTTP server used by the broker.
 
-####`broadcast : function(message, [filterCriteria])` 
+#####`broadcast : function(message, [filterCriteria])` 
 Broadcasts the `message` to all connected clients. If `filterCriteria` is
 supplied, each client's `sessionInfo` object will be compared to it
 and only matching clients go get the message.
@@ -290,10 +290,46 @@ list only contains a single message.
 
 The following is a list of built-in broker commands.
 
+#####`{ type : 'close' [, match : {criteria}] }`
+Closes active connections. 
+
+If sent without the optional match
+parameter from the backend as part of a response to an event,
+this will close the active connection that initiated the event.
+
+If used with the optional match object, all connections with a 
+matching `sessionInfo` will be terminated.
+
+#####`{ type : 'list' [, match : {criteria}]  }`
+Retrieves a list of currently active connections.
+
+If used with the optional match object, all connections with a 
+matching `sessionInfo` will be returned.
+
 #####`{ type : 'log', text : '(log message') }`
 Causes the broker to log `text` to its output log.
 
+#####`{ type : 'send', message : {message} [, match : {criteria}] }`
+Passes `message` through to the client.
 
+If sent without the optional match
+parameter from the backend as part of a response to an event,
+this will send the message to the connection that
+initiated the event.
+
+If used with the optional match object, all connections with a 
+matching `sessionInfo` will receive the message.
+
+#####`{ type : 'session', data : {session} [, match : {criteria}] }`
+Sets `sessionInfo` fields of connections.
+
+If sent without the optional match
+parameter from the backend as part of a response to an event,
+this will update the `sessionInfo` of the connection that
+initiated the event.
+
+If used with the optional match object, all connections with a 
+matching `sessionInfo` will be updated.
 
 
 

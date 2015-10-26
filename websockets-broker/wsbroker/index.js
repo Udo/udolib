@@ -49,6 +49,18 @@ var match = function(crit1, crit2) {
   return(result);
 }
 
+var applyCommand = function(broker, connection, criteria, applyFunc) {
+  if(connection && !criteria) {
+    applyFunc(connection);
+  }
+  else 
+    Lodash.forEach(broker.websocketServer.clients, function(client) {
+      if(!criteria || match(criteria, client.sessionInfo)) {
+        applyFunc(client);
+      }
+    });
+}
+
 var backendCommands = {
   
   log : function(broker, connection, message) {
@@ -56,36 +68,23 @@ var backendCommands = {
   },
   
   session : function(broker, connection, message) {
-    if(message.data && connection) {
-      Lodash.merge(connection.sessionInfo, message.data);
-    }
-  },
-  
-  response : function(broker, connection, message) {
-    if(connection) {
-      sendClientMessage(broker, connection, message.message);
-    }
+    applyCommand(broker, connection, message.match, function(client) {
+      Lodash.merge(client.sessionInfo, message.data);
+    });
   },
   
   close : function(broker, connection, message) {
-    if(connection && !message.match)
-      connection.close();
-    if(message.match)
-      Lodash.forEach(broker.websocketServer.clients, function(connection) {
-        if(!message.match || match(message.match, connection.sessionInfo)) {
-          connection.close();
-        }
-      });
+    applyCommand(broker, connection, message.match, function(client) {
+      client.close();
+    });
   },
   
   send : function(broker, connection, message) {
     var payload = JSON.stringify(message.message);
     var recipients = [];
-    Lodash.forEach(broker.websocketServer.clients, function(client) {
-      if(!message.match || match(message.match, connection.sessionInfo)) {
-        sendClientMessage(broker, client, payload, true);
-        recipients.push(client);
-      }
+    applyCommand(broker, connection, message.match, function(client) {
+      sendClientMessage(broker, client, payload, true);
+      recipients.push(client);
     });
     if(broker.config.log)
       console.log('← sent to '+(recipients.length)+'/'+(broker.websocketServer.clients.length)+' clients', message.message);
@@ -93,9 +92,9 @@ var backendCommands = {
   
   list : function(broker, connection, message) {
     var result = [];
-    Lodash.forEach(broker.websocketServer.clients, function(connection) {
-      if(!message.match || match(message.match, connection.sessionInfo)) {
-        result.push(connection.sessionInfo);
+    Lodash.forEach(broker.websocketServer.clients, function(client) {
+      if(!message.match || match(message.match, client.sessionInfo)) {
+        result.push(client.sessionInfo);
       }
     });
     return(result);

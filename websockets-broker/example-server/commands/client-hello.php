@@ -1,7 +1,7 @@
 <?php
   
   $result[] = array(
-    'type' => 'response',
+    'type' => 'send',
     'message' => array(
       'type' => 'text',
       'text' => 'world',
