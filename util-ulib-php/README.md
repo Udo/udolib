@@ -25,13 +25,26 @@ ulib is released into the public domain.
 
 ## ageToString($unixDate, $new = 'just now', $ago = 'ago')
 
+Takes a Unix timestamp and converts it to a human-friendly
+date. If the timestamp points to a recent time, this function
+will return a relative result, such as "4 min ago".
+
+```PHP
+print( ageToString(time()-1234) );
+```
+
+Output:
+```
+21 min ago
+```
+
 ## capitalize($name)
 
-## element($name)
+## element($name, ...)
 
 ## endsWith($s, $match)
 
-## first()
+## first(...)
 
 ## map($list, $func)
 
