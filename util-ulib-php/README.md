@@ -125,6 +125,13 @@ default value
 
 ## map($list, $func)
 
+Iterates through $list and calls `$func($item, $key)` on every
+single item. If $func returns a non-null value, that value will
+be appended to a new list. This new list is then returned by `map()`.
+
+If $list is null, the result will be an empty list. If $list is
+not an array, it will be converted into an array with one element.
+
 ```PHP
 $list = array(1, 2, 3, 4, 5);
 # put even entries in new list
@@ -145,6 +152,7 @@ Array
 
 ## match($subject, $criteria)
 
+Returns `true` if $subject matches all the fields of $criteria.
 
 ```PHP
 $person = array('name' => 'Jon', 'family' => 'Doe', 'age' => '21');
@@ -157,7 +165,13 @@ Output:
 1
 ```
 
-## nibble($delim, $cake)
+## nibble($delim, &$cake, &$found = false)
+
+Returns $cake up to (but not including) $delim.
+$cake gets shortened to everything following after $delim.
+If $cake does not contain $delim, `nibble()` will
+return the entirety of $cake, and the $cake
+variable will be an empty string.
 
 ```PHP
 $myString = 'answer=42';
@@ -173,6 +187,23 @@ equals 42
 ```
 
 ## parseRequestURI($uri = $_SERVER['REQUEST_URI'])
+
+This is a convenience replacement for the built-in `parse_url()` function.
+parseRequestURI() returns a record of URL components it finds in $uri.
+
+The key difference to the built-in function is its handling of 
+the request path, which is optimized to work with "pretty" URL
+rules commonly used on Apache or NginX (compatible with Wordpress URLs).
+
+parseRequestURI() also allows for "pretty" URLs where URL rewriting
+is not an option. In these cases, you can revert to a scheme where
+the path is appended after a ? symbol, like this:
+
+`/index.php?/some/path?bla=1`
+
+When parseRequestURI() detects such a path, it will put it
+in the field `path2`, allowing you to make the decision on
+how to deal with it in your app.
 
 ```PHP
 print_r( parseRequestURI() );
@@ -193,6 +224,15 @@ Array
 ```
 
 ## reduce($list, $func)
+
+Iterates through all the items in $list and calls
+`$func($total, $item)` on every item, where $total
+is the value of the reduce process so far (starting with null)
+and $item is the current item. 
+
+If $func returns a non-null value, that value will
+become the new $total on the next call. At the end,
+$total is returned by `reduce()`.
 
 ```PHP
 $list = array(1, 2, 3, 4, 5);
@@ -223,6 +263,11 @@ Output:
 ```
 
 ## truncate($s, $maxLength, $indicator = '')
+
+Returns $s. If $s is longer than $maxLength, it
+will be shortened. In case shortening occurrs,
+you can specify an $indicator that gets appended
+to the result.
 
 ```PHP
 print( truncate('hello world', 5, 'É') );
