@@ -80,12 +80,12 @@ Output:
 <h2>Hello World</h2>
 ```
 
-### elementDir
+#### elementDir
 
 If `$GLOBALS['elementDir']` is set, `element()` will use it as a prefix to locate the
 element file.
 
-### elementLoader
+#### elementLoader
 
 If `$GLOBALS['elementLoader']` is set to a function, `element()` will use it 
 to load the element function instead of simply including it from a file. `$GLOBALS['elementLoader']`
