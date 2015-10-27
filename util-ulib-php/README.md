@@ -67,7 +67,7 @@ A very simple element file might look like this:
 });
 ```
 
-Here's ahow the element is being used:
+Here's how the element is being used:
 
 
 ```PHP
