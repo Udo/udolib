@@ -1,11 +1,11 @@
 {
   "name": "wsbroker",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A Websockets-to-backend connection broker",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Udo/WSBrokerBoilerplate"
+    "url": "https://github.com/Udo/udolib"
   },
   "keywords": [
     "websockets",
