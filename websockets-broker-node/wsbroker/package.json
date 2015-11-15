@@ -1,6 +1,6 @@
 {
   "name": "wsbroker",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A Websockets-to-backend connection broker",
   "main": "index.js",
   "repository": {

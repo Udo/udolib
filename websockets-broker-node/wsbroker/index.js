@@ -250,3 +250,7 @@ exports.Broker = function(config) {
   broker.log = function(message) { backendCommands.log(broker, null, message); };
   broker.websocketServer = initWebSocketServer(broker); 
 }
+
+exports.Lodash = Lodash;
+exports.WS = WS;
+exports.Request = Request;
