@@ -43,7 +43,7 @@ var match = function(crit1, crit2) {
   Lodash.forEach(crit1, function(val, key) {
     var val1 = val+'';
     var val2 = crit2[key]+'';
-    if(val1.toLowerCase() != val2.toLowerCase())
+    if(val1 != '*' && val1.toLowerCase() != val2.toLowerCase())
       result = false;
   });
   return(result);

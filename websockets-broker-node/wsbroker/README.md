@@ -297,6 +297,23 @@ print_r(httpRequest('http://localhost:'.$config['wsPort'].'/', array(
 it expects a list of command messages (see example), even if that
 list only contains a single message.
 
+## Matching Criteria
+
+Many commands take a matching criteria parameter, and only
+connections where the sessionInfo matches those criteria will
+receive the data in question. The match performed is a non-case-sensitive
+string match on specified keys:
+
+```
+  { someField : 'myValue' }
+```
+
+In this example, all connections with a `sessionInfo.someField` of
+'myValue' will be matched, as will those with alternative capitalizations
+such as 'MYVALUE'.
+
+You can specify a wildcard match by using `'*'` as the match string.
+
 ## Broker Commands
 
 The following is a list of built-in broker commands.
