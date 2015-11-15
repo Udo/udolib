@@ -69,7 +69,7 @@ var backendCommands = {
   
   session : function(broker, connection, message) {
     applyCommand(broker, connection, message.match, function(client) {
-      Lodash.merge(client.sessionInfo, message.data);
+      client.sessionInfo = Lodash.merge(client.sessionInfo, message.data);
     });
   },
   
