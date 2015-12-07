@@ -88,6 +88,7 @@ var backendCommands = {
     });
     if(broker.config.log)
       console.log('← sent to '+(recipients.length)+'/'+(broker.websocketServer.clients.length)+' clients', message.message);
+    return({ sentCounter : recipients.length, totalClients : broker.websocketServer.clients.length });
   },
   
   list : function(broker, connection, message) {
@@ -123,14 +124,14 @@ var onBackendMessage = function(broker, connection, message) {
 var sendBackendMessage = function(broker, connection, message, whenDone) {
   if(broker.config.backend && broker.config.backend.type == 'http') {
     var data = { message : JSON.stringify(message), connection : JSON.stringify(connection.sessionInfo) };
-    if(broker.config.log)
+    if(broker.config.backendLog)
       console.log('↑ to backend', message);
     Request.post(
       { url : broker.config.backend.url, formData: data}, 
       function(upstreamError, httpResponse, body) {
         var backendResponse = safeParseJSON(body);
         if(upstreamError && broker.config.log)
-          console.log('! backend error', err, data);
+          console.log('! backend error', data);
         else if(whenDone)
           whenDone(backendResponse);
         else
@@ -196,13 +197,15 @@ var onCommandRequest = function(broker, request, response) {
       // todo: obviously, this only works with url encoded form data
       var address = request.connection.remoteAddress;
       if(!broker.config.backend || !broker.config.backend.allow || broker.config.backend.allow.indexOf(address) == -1) {
-        response.end('access denied');
+        response.end('access denied to from '+address);
       } else {
         var params = QueryString.parse(body);
         var data = {};
         if(params.data) data = safeParseJSON(params.data);
         if(data.length > 0)
           response.write(JSON.stringify(onBackendMessage(broker, null, data)));
+        else
+          response.write(JSON.stringify({ type : 'notice', 'reason' : 'no commands specified', p : params }));
         response.end();
       }
     });
@@ -249,6 +252,9 @@ exports.Broker = function(config) {
     backendCommands.send(broker, null, command); };
   broker.log = function(message) { backendCommands.log(broker, null, message); };
   broker.websocketServer = initWebSocketServer(broker); 
+  broker.sendBackendMessage = function(message, whenDone) {
+    sendBackendMessage(broker, { sessionInfo : { type : 'direct' }}, message, whenDone);
+  };
 }
 
 exports.Lodash = Lodash;
