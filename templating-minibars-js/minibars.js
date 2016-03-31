@@ -1,6 +1,10 @@
 'use strict';
 // author: udo.schroeter@gmail.com
-// caution: right now this only works on Chrome!
+
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.split(search).join(replacement);
+};
 
 var _m = {
   
@@ -16,7 +20,7 @@ var _m = {
         i = text.length;
       } 
       else {
-        var rawField = text.substr(tkPos, 3) === '{{{';
+        var rawField = text.substr(tkPos, 3) == '{{{';
         var closeBy = '}}' + (rawField ? '}' : '');
         var tkEnd = text.indexOf(closeBy, tkPos);
         if(tkEnd === -1) {
@@ -70,7 +74,7 @@ var _m = {
       
     safe : function(raw) {
       if(raw == null) raw = '';
-      return((raw +'').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;'));
+      return((raw +'').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'));
     },
     
     unsafe : function(raw) {
@@ -80,12 +84,12 @@ var _m = {
     // resolve field from label at compile time
     field : function(label) {
       label = (label || '').trim();
-      if(label[0] === '"' && label[label.length-1] === '"') return(JSON.stringify(label.slice(1, -1)));
-      if(label === 'this') return(_m.scope);
-      if(label[0] === '@') return(label.slice(1));
+      if(label[0] == '"' && label[label.length-1] == '"') return(JSON.stringify(label.slice(1, -1)));
+      if(label == 'this') return(_m.scope);
+      if(label[0] == '@') return(label.slice(1));
       var scope = _m.scope;
       var upCnt = 0;
-      while(label[0] === '.') {
+      while(label[0] == '.') {
         // access parent scopes with ..
         if(upCnt > 0 && _m.stack.length >= upCnt) {
           scope = _m.stack[_m.stack.length-upCnt];                    
@@ -96,7 +100,7 @@ var _m = {
       var levels = label.split('.');
       var acc = '';
       levels.forEach(function(fn) {
-        if(fn[0] === '/') fn = fn.slice(1);
+        if(fn[0] == '/') fn = fn.slice(1);
         acc += '['+JSON.stringify(fn)+']';
       });      
       return(scope+acc);
@@ -219,7 +223,7 @@ var _m = {
     },
     
     _field_f : function(token, opt) {
-      if(token.block === 'start' || token.block === 'end') {
+      if(token.block == 'start' || token.block == 'end') {
         var genKey = token.val+'_'+token.block;
         if(_m.gen[genKey])
           return(_m.gen[genKey](token));
@@ -230,7 +234,7 @@ var _m = {
       }
       if(_m.gen[token.val])
         return(_m.gen[token.val](token));
-      if(typeof opt[token.val] === 'function')
+      if(typeof opt[token.val] == 'function')
         return(_m.gen._invoke_synth('opt', token));
       else {
         return('o += _m.utils.'+
