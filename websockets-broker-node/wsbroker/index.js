@@ -4,8 +4,8 @@ var Url = require('url');
 var Request = require('request');
 var HttpServer = require("http"); 
 var Lodash = require("lodash"); 
-var WS = require('ws');
-var WebSocketServer = require('ws').Server;
+var WS = require('uws');
+var WebSocketServer = require('uws').Server;
  
 var safeParseJSON = function(raw) {
   if(!typeof raw == 'string') return(raw);
@@ -88,7 +88,6 @@ var backendCommands = {
     });
     if(broker.config.log)
       console.log('← sent to '+(recipients.length)+'/'+(broker.websocketServer.clients.length)+' clients', message.message);
-    return({ sentCounter : recipients.length, totalClients : broker.websocketServer.clients.length });
   },
   
   list : function(broker, connection, message) {
@@ -124,14 +123,14 @@ var onBackendMessage = function(broker, connection, message) {
 var sendBackendMessage = function(broker, connection, message, whenDone) {
   if(broker.config.backend && broker.config.backend.type == 'http') {
     var data = { message : JSON.stringify(message), connection : JSON.stringify(connection.sessionInfo) };
-    if(broker.config.backendLog)
+    if(broker.config.log)
       console.log('↑ to backend', message);
     Request.post(
       { url : broker.config.backend.url, formData: data}, 
       function(upstreamError, httpResponse, body) {
         var backendResponse = safeParseJSON(body);
         if(upstreamError && broker.config.log)
-          console.log('! backend error', data);
+          console.log('! backend error', err, data);
         else if(whenDone)
           whenDone(backendResponse);
         else
@@ -197,15 +196,13 @@ var onCommandRequest = function(broker, request, response) {
       // todo: obviously, this only works with url encoded form data
       var address = request.connection.remoteAddress;
       if(!broker.config.backend || !broker.config.backend.allow || broker.config.backend.allow.indexOf(address) == -1) {
-        response.end('access denied to from '+address);
+        response.end('access denied');
       } else {
         var params = QueryString.parse(body);
         var data = {};
         if(params.data) data = safeParseJSON(params.data);
         if(data.length > 0)
           response.write(JSON.stringify(onBackendMessage(broker, null, data)));
-        else
-          response.write(JSON.stringify({ type : 'notice', 'reason' : 'no commands specified', p : params }));
         response.end();
       }
     });

@@ -1,6 +1,6 @@
 {
   "name": "wsbroker",
-  "version": "1.0.9",
+  "version": "1.0.12",
   "description": "A Websockets-to-backend connection broker",
   "main": "index.js",
   "repository": {
@@ -19,6 +19,6 @@
   "dependencies": {
     "lodash": "^3.10.1",
     "request": "^2.65.0",
-    "ws": ">= 0.6.0"
+    "uws": "^0.10.4"
   }
 }
