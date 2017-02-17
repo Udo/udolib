@@ -4,8 +4,8 @@ var Url = require('url');
 var Request = require('request');
 var HttpServer = require("http"); 
 var Lodash = require("lodash"); 
-var WS = require('uws');
-var WebSocketServer = require('uws').Server;
+var WS = require('ws');
+var WebSocketServer = require('ws').Server;
  
 var safeParseJSON = function(raw) {
   if(!typeof raw == 'string') return(raw);
@@ -209,7 +209,7 @@ var onCommandRequest = function(broker, request, response) {
   }
   else {
     response.writeHead(200, {'Content-Type': 'text/html'});
-    response.end(html);
+    response.end('');
   }
 }
 

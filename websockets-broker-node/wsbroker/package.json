@@ -1,6 +1,6 @@
 {
   "name": "wsbroker",
-  "version": "1.0.12",
+  "version": "1.0.15",
   "description": "A Websockets-to-backend connection broker",
   "main": "index.js",
   "repository": {
@@ -17,8 +17,8 @@
   "license": "public domain",
   "homepage": "https://github.com/Udo/udolib",
   "dependencies": {
-    "lodash": "^3.10.1",
-    "request": "^2.65.0",
-    "uws": "^0.10.4"
+    "lodash": "^4.16.4",
+    "request": "^2.76.0",
+    "ws": "^1.1.1"
   }
 }
