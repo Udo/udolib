@@ -12,7 +12,7 @@ still faster than Array.splice()-based structures.
 ## Pushing Items onto the Queue
 
 ```
-push = function(prio, payload)
+# push = function(prio, payload)
 ```
 Pushes a payload items with a certain priority into the queue.
 
@@ -27,17 +27,17 @@ Pushes a payload items with a certain priority into the queue.
 ## Popping Items from the Queue
 
 ```
-function peek() 
+# q.peek() 
 ```
 Returns the item with the lowest priority but leaves it in the queue.
 
 ```
-function peekPriority() 
+# q.peekPriority() 
 ```
 Returns the priorty of the item with the lowest priority.
 
 ```
-function pop() 
+# q.pop() 
 ```
 Retrieves the item with the lowest priority and removes it from the queue.
 
