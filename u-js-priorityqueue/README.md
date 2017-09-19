@@ -27,17 +27,17 @@ Pushes a payload items with a certain priority into the queue.
 ## Popping Items from the Queue
 
 ```
-peek = function() 
+function peek() 
 ```
 Returns the item with the lowest priority but leaves it in the queue.
 
 ```
-peekPriority = function() 
+function peekPriority() 
 ```
 Returns the priorty of the item with the lowest priority.
 
 ```
-pop = function() 
+function pop() 
 ```
 Retrieves the item with the lowest priority and removes it from the queue.
 
