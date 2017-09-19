@@ -1,5 +1,7 @@
 # Udolib Priority Queue
 
+This is worst case O(n) for push() and pop(), but should be reasonably fast with small n 
+
 ## Creating a Queue
 
 ```

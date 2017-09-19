@@ -26,13 +26,13 @@ var PriorityQueue = {
       var p;
       var ap;
       while (i > 0) {
-          p = (i - 1) >> 1;
-          ap = q.items[p];
-          if (!q.compare(v, ap)) {
-            break;
-          }
-          q.items[i] = ap;
-          i = p;
+        p = (i - 1) >> 1;
+        ap = q.items[p];
+        if (!q.compare(v, ap)) {
+          break;
+        }
+        q.items[i] = ap;
+        i = p;
       }
       q.items[i] = v;      
     }
@@ -49,13 +49,13 @@ var PriorityQueue = {
         r = l + 1;
         bestc = q.items[l];
         if (r < size) {
-            if (q.compare(q.items[r], bestc)) {
-                l = r;
-                bestc = q.items[r];
-            }
+          if (q.compare(q.items[r], bestc)) {
+            l = r;
+            bestc = q.items[r];
+          }
         }
         if (!q.compare(bestc, ai)) {
-            break;
+          break;
         }
         q.items[i] = bestc;
         i = l;
