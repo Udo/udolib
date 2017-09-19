@@ -8,7 +8,7 @@
 var PriorityQueue = {
 
   defaultCompare : function(a, b) {
-    return( a < b );
+    return( a[0] < b[0] );
   },
 
   create : function(optionalCustomCompareFunction) {
@@ -19,7 +19,8 @@ var PriorityQueue = {
       size : 0,
     };
 
-    q.push = function(v) {
+    q.push = function(prio, payload) {
+      var v = [prio, payload];
       var i = q.size;
       q.items[q.size] = v;
       q.size += 1;
@@ -65,8 +66,14 @@ var PriorityQueue = {
 
     q.peek = function() {
       if(q.size == 0) 
-        return(false);
-      return(q.items[0]);
+        return(false);      
+      return(q.items[0][1]);
+    }
+
+    q.peekPriority = function() {
+      if(q.size == 0) 
+        return(false);      
+      return(q.items[0][0]);
     }
 
     q.pop = function() {
@@ -79,7 +86,7 @@ var PriorityQueue = {
       } else {
         q.size -= 1;
       }
-      return(res);
+      return(res[1]);
     }
 
     q.cleanup = function() {

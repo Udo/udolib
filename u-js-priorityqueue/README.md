@@ -12,6 +12,11 @@ still faster than Array.splice()-based structures.
 ## Pushing Items onto the Queue
 
 ```
+push = function(prio, payload)
+```
+Pushes a payload items with a certain priority into the queue.
+
+```
   p.push(1);
   p.push(11);
   p.push(2);
@@ -22,8 +27,23 @@ still faster than Array.splice()-based structures.
 ## Popping Items from the Queue
 
 ```
+peek = function() 
+```
+Returns the item with the lowest priority but leaves it in the queue.
+
+```
+peekPriority = function() 
+```
+Returns the priorty of the item with the lowest priority.
+
+```
+pop = function() 
+```
+Retrieves the item with the lowest priority and removes it from the queue.
+
+```
   while(pq.peek()) {
-    console.log(pq.pop());
+    console.log(pq.peekPriority(), pq.pop());
   }
 ```
 
