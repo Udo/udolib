@@ -1,6 +1,7 @@
 # Udolib Priority Queue
 
-This is worst case O(n) for push() and pop(), but should be reasonably fast with small n 
+This is worst case O(n) for push() and pop(), but should be reasonably fast with small n,
+still faster than Array.splice()-based structures. 
 
 ## Creating a Queue
 
