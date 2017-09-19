@@ -6,7 +6,7 @@ still faster than Array.splice()-based structures.
 ## Creating a Queue
 
 ```
-  var p = PriorityQueue.create();
+  var q = PriorityQueue.create();
 ```
 
 ## Pushing Items onto the Queue
@@ -17,11 +17,11 @@ push = function(prio, payload)
 Pushes a payload items with a certain priority into the queue.
 
 ```
-  p.push(1);
-  p.push(11);
-  p.push(2);
-  p.push(9);
-  p.push(5);
+  q.push(1);
+  q.push(11);
+  q.push(2);
+  q.push(9);
+  q.push(5);
 ```
 
 ## Popping Items from the Queue
@@ -42,13 +42,13 @@ function pop()
 Retrieves the item with the lowest priority and removes it from the queue.
 
 ```
-  while(pq.peek()) {
-    console.log(pq.peekPriority(), pq.pop());
+  while(q.peek()) {
+    console.log(q.peekPriority(), q.pop());
   }
 ```
 
 ## Trimming the Queue's Internal Storage
 
 ```
-  p.cleanup();
+  q.cleanup();
 ```
