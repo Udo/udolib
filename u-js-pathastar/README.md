@@ -42,6 +42,7 @@ If no path could be found, `find()` will return a result like this:
 		highwaterMark: 23,
 		nodesConsidered: 213,
 		time: 0.00244500000000005,
+		totalCost: 0,
 	}, 
 	path: []
 }
@@ -58,6 +59,7 @@ A successful `find()` looks like this:
 		highwaterMark: 23,
 		nodesConsidered: 213,
 		time: 0.00244500000000005,
+		totalCost: 29,
 	}, 
 	path: [{NODE}, {NODE}, ...]
 }
@@ -136,6 +138,20 @@ var pfResult = PathAStar.find( startNode, endNode, eachNeighbor, myMovementCostF
 ```
 
 The movement cost function will only ever be called to evaluate movement between two directly connected nodes.
+
+### Tile-Variant Movement Cost Example
+
+Here is an example custom movement cost function that takes distance as well as a per-tile cost into account:
+
+```
+  var customMovementCost = function(fromNode, toNode) {
+    var dx = (fromNode.x - toNode.x);
+    var dy = (fromNode.y - toNode.y);
+    return(Math.sqrt(dx*dx + dy*dy) + toNode.movCost*10);
+  }
+```
+
+![Cost varies by tile](https://github.com/Udo/udolib/blob/master/u-js-pathastar/pathastar-example2.png?raw=true "Cost varies by tile")
 
 ## Custom Distance Heuristic
 

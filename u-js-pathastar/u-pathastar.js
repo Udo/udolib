@@ -65,6 +65,7 @@ var PathAStar = {
             time : (performance.now() - startTime) / 1000,
             highwaterMark : countHighWatermark,
             nodesConsidered : countConsidered,
+            totalCost : costSoFar[currentNode.id],
           },
           path : PathAStar.extractPath(history, endNode, idField) 
           });
@@ -90,6 +91,7 @@ var PathAStar = {
         time : (performance.now() - startTime) / 1000,
         highwaterMark : countHighWatermark,
         nodesConsidered : countConsidered,
+        totalCost : 0,
       },
       path : [] });   
   },
