@@ -29,7 +29,7 @@ var pfResult = PathAStar.find( startNode, endNode, eachNeighbor );
 
 `endNode`: the graph node where the search ends (must be traversable)
 
-`eachNeighbor(currentNode, callbackFunc)`: a function that takes a node and a callback as parameters. The function is expected to invoke the `callbackFunc` for each neighboring node of `currentNode`.
+`eachNeighbor(currentNode, callbackFunc)`: a function that takes a node and a callback as parameters. The function is expected to invoke the `callbackFunc` for each neighboring node of `currentNode` (for more information, see below in the "eachNeighbor" section).
 
 If no path could be found, `find()` will return a result like this:
 
