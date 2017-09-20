@@ -63,3 +63,72 @@ In this case, the `path` field will contain an array of all the nodes that make 
 
 ## The `eachNeighbor` Function
 
+The flexibility of this pathfinder comes from the fact that graph traversal is provided by the user-supplied `eachNeighbor` function. Here is how to write one:
+
+```
+var myGraph = ...
+var getNodeNeighborsExample = function(node, f) {
+  var c = false;
+  c = myGraph[node.y][node.x-1]; if(c && c.walkable) f(c);
+  c = myGraph[node.y][node.x+1]; if(c && c.walkable) f(c);
+  c = myGraph[node.y-1][node.x]; if(c && c.walkable) f(c);
+  c = myGraph[node.y+1][node.x]; if(c && c.walkable) f(c);
+}
+```
+
+In this example, the graph nodes are stored in a 2-dimensional array, and each node has an `x` and a `y` field to indicate its position in the grid. The pathfinder will call `getNodeNeighborsExample` for each node it traverses, to find the (walkable) neighboring nodes. In the `getNodeNeighborsExample` example function, each node only has four possible neighbors, one in each cardinal direction. 
+
+It's easy to see how other topologies and other containers would be implemented. Here is an example for a flat hashmap grid with cardinal and inter-cardinal neighbors, and node objects that also feature `x` and `y` designators. In this example, each node is addressible within the container by the string `(x+':'+y)`:
+
+```
+var eachNeighbor = function(n, f) {
+  var c = false;
+  c = grid[(n.x-1)+':'+(n.y-1)]; if(c && c.walkable) f(c);
+  c = grid[(n.x-1)+':'+(n.y)];   if(c && c.walkable) f(c);
+  c = grid[(n.x-1)+':'+(n.y+1)]; if(c && c.walkable) f(c);
+  c = grid[(n.x)+':'+(n.y-1)];   if(c && c.walkable) f(c);
+  c = grid[(n.x)+':'+(n.y+1)];   if(c && c.walkable) f(c);
+  c = grid[(n.x+1)+':'+(n.y-1)]; if(c && c.walkable) f(c);
+  c = grid[(n.x+1)+':'+(n.y)];   if(c && c.walkable) f(c);
+  c = grid[(n.x+1)+':'+(n.y+1)]; if(c && c.walkable) f(c);
+}
+```
+
+Here is an example for an amorphous graph, where each nodes stores a list of its own neighbors:
+
+```
+var amorphousNeighborExample = function(node, f) {
+  node.neighbors.forEach(f);
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
