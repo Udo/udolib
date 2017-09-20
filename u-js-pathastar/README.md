@@ -14,9 +14,9 @@ Assumptions:
 
 * Each node must have an id field that uniquely identifies it. By default the name of that field is "id". If the algorithm sees a node without such an id field it will generate one on the fly and modify the node accordingly. This is the only operation that modifies nodes.
 
-* The starting node and the end node are assumed to be traversable. If there is a chance that they're not, this must be checked before PathAStar.find() is called. The reason why the pathfinder doesn't check this on its own is that it has no built-in concept of reachability - instead this functionality is injected with the `eachNeighbor` function that must be supplied with the find() call.
+* The starting node and the end node are assumed to be traversable. If there is a chance they're not, this must be checked before PathAStar.find() is called. The reason why the pathfinder doesn't check this on its own is that it has no built-in concept of reachability - instead this functionality is injected with the `eachNeighbor` function that must be supplied with the find() call.
 
-* The default movement cost and heuristic functions assume that each node has an `x` and a `y` field indicating its position on a flat map. If your graph nodes work differently, you can supply your own heuristic and/or costing functions (see below).
+* The default movement cost and heuristic functions assume each node has an `x` and a `y` field indicating its position on a flat map. If your graph nodes work differently, you can supply your own heuristic and/or costing functions (see below).
 
 ## Basic Usage
 
