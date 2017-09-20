@@ -104,7 +104,7 @@ var amorphousNeighborExample = function(node, f) {
 }
 ```
 
-## Movement Cost
+## Custom Movement Cost
 
 By default, Udolib's PathAStar finder assumes each node has an `x` and a `y` field representing the node's position on a flat 2D map, to make the most common use case easier to deal with. This default function is used _both_ for calculating the movement cost between any two nodes _and_ as a heuristic for the total distance between any two nodes in the graph. The default implementation is stored in `PathAStar.config.defaultLinearDistance` and looks like this:
 
@@ -133,11 +133,24 @@ Invoking `find()` with a custom movement cost function works like so:
 var pfResult = PathAStar.find( startNode, endNode, eachNeighbor, myMovementCostFunction );
 ```
 
+## Custom Distance Heuristic
 
+The A* algorithm uses a heuristic function to determine the approximate distance between any two nodes. It uses this heuristic to determine which nodes are the more promising to investigate next. By default, Udolib's finder uses the same distancing function as shown above in the movement section. If your graph nodes do not have an `x` and `y` field to prepresent their position on a flat 2D map, or if the topology of your map is different, you need to provide your own heuristic function for this.
 
+Invoking `find()` with a custom movement cost _and_ custom heuristic function works like so:
 
+```javascript
+// finding a path from startNode to endNode, using a custom movement cost function
+var pfResult = PathAStar.find( startNode, endNode, eachNeighbor, myMovementCostFunction, myHeuristic );
+```
 
+## Custom `id` Field
 
+For its internal scratch storage, Udolib's finder needs every node to have a unique (string or numeric) ID field (because Javascript does not expose a suitable mechanism to uniquely identify an object).
+
+By default, the function assumes the name of this field is "id", as in `node.id`. Whenever the algorithm encounters are node that does not have this field set, it fills it with an auto-generated value. To prevent this, make sure every node does have its ID field set before calling `find()`.
+
+You can change the _name_ of this expected field by changing the value of `PathAStar.config.nodeIdField` to whatever you need it to be.
 
 
 
