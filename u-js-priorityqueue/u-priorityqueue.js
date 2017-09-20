@@ -88,7 +88,7 @@ var PriorityQueue = {
       }
       return(res[1]);
     }
-
+    
     q.cleanup = function() {
       q.items = q.items.slice(0, q.size);
     }

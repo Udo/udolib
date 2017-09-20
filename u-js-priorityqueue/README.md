@@ -47,6 +47,8 @@ Retrieves the item with the lowest priority and removes it from the queue.
   }
 ```
 
+Example showing all three functions in action.
+
 ## Trimming the Queue's Internal Storage
 
 ```
