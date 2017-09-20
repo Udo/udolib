@@ -150,7 +150,7 @@ Keep in mind that the heuristic function must be able to return a reasonable dis
 
 ## Custom `id` Field
 
-For its internal scratch storage, Udolib's finder needs every node to have a unique (string or numeric) ID field (because Javascript does not expose a suitable mechanism to uniquely identify an object).
+For its internal scratch storage, Udolib's finder needs every node to have a unique (string or numeric) ID field, because Javascript does not expose a suitable mechanism to uniquely identify an object.
 
 By default, the function assumes the name of this field is "id", as in `node.id`. Whenever the algorithm encounters are node that does not have this field set, it fills it with an auto-generated value. To prevent this, make sure every node does have its ID field set before calling `find()`.
 
