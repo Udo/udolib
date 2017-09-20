@@ -96,7 +96,7 @@ var eachNeighbor = function(n, f) {
 }
 ```
 
-Here is an example for an amorphous graph, where each nodes stores a list of its own neighbors:
+Here is an example for an amorphous graph, where each node stores a list of its own neighbors:
 
 ```javascript
 var amorphousNeighborExample = function(node, f) {
