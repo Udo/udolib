@@ -18,7 +18,7 @@ Assumptions:
 
 ## Basic Usage
 
-```
+```javascript
 // finding a path from startNode to endNode
 var pfResult = PathAStar.find( startNode, endNode, eachNeighbor );
 ```
@@ -31,7 +31,7 @@ var pfResult = PathAStar.find( startNode, endNode, eachNeighbor );
 
 If no path could be found, `find()` will return a result like this:
 
-```
+```javascript
 { 
 	result: "no-path", 
 	debug: {
@@ -47,7 +47,7 @@ The `debug` record shows information about the pathfinding process, such as how 
 
 A successful `find()` looks like this:
 
-```
+```javascript
 { 
 	result: "path", 
 	debug: {
@@ -65,7 +65,7 @@ In this case, the `path` field will contain an array of all the nodes that make 
 
 The flexibility of this pathfinder comes from the fact that graph traversal is provided by the user-supplied `eachNeighbor` function. Here is how to write one:
 
-```
+```javascript
 var myGraph = ...
 var getNodeNeighborsExample = function(node, f) {
   var c = false;
@@ -80,7 +80,7 @@ In this example, the graph nodes are stored in a 2-dimensional array, and each n
 
 It's easy to see how other topologies and other containers would be implemented. Here is an example for a flat hashmap grid with cardinal and inter-cardinal neighbors, and node objects that also feature `x` and `y` designators. In this example, each node is addressible within the container by the string `(x+':'+y)`:
 
-```
+```javascript
 var eachNeighbor = function(n, f) {
   var c = false;
   c = grid[(n.x-1)+':'+(n.y-1)]; if(c && c.walkable) f(c);
@@ -96,7 +96,7 @@ var eachNeighbor = function(n, f) {
 
 Here is an example for an amorphous graph, where each nodes stores a list of its own neighbors:
 
-```
+```javascript
 var amorphousNeighborExample = function(node, f) {
   node.neighbors.forEach(f);
 }
