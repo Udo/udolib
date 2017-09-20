@@ -133,6 +133,8 @@ Invoking `find()` with a custom movement cost function works like so:
 var pfResult = PathAStar.find( startNode, endNode, eachNeighbor, myMovementCostFunction );
 ```
 
+The movement cost function will only ever be called to evaluate movement between two directly connected nodes.
+
 ## Custom Distance Heuristic
 
 The A* algorithm uses a heuristic function to determine the approximate distance between any two nodes. It uses this heuristic to determine which nodes are the more promising to investigate next. By default, Udolib's finder uses the same distancing function as shown above in the movement section. If your graph nodes do not have an `x` and `y` field to prepresent their position on a flat 2D map, or if the topology of your map is different, you need to provide your own heuristic function for this.
@@ -143,6 +145,8 @@ Invoking `find()` with a custom movement cost _and_ custom heuristic function wo
 // finding a path from startNode to endNode, using a custom movement cost function
 var pfResult = PathAStar.find( startNode, endNode, eachNeighbor, myMovementCostFunction, myHeuristic );
 ```
+
+Keep in mind that the heuristic function must be able to return a reasonable distance approximation between any two nodes in the graph.
 
 ## Custom `id` Field
 
