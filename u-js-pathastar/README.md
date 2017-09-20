@@ -18,7 +18,7 @@ Assumptions:
 
 * The default movement cost and heuristic functions assume each node has an `x` and a `y` field indicating its position on a flat map. If your graph nodes work differently, you can supply your own heuristic and/or costing functions (see below).
 
-![Path finding example](https://github.com/Udo/udolib/blob/master/u-js-pathastar/pathastar-example1.png "Udolib A-Star Pathfinder")
+![Path finding example](https://github.com/Udo/udolib/blob/master/u-js-pathastar/pathastar-example1.png?raw=true "Udolib A-Star Pathfinder")
 
 ## Basic Usage
 
