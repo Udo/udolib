@@ -114,7 +114,7 @@ Calls the function `f` on all neighbors of the `cell`.
 
 ## grid.options 
 
-(⇌ object/hashmap) These are the options passed into the grid with `HexTools.createGrid()` (see there). You can pass arbitrary other options into this as well as modify the `options` object for your own purposes.
+(⇌ object) These are the options passed into the grid with `HexTools.createGrid()` (see there). You can pass arbitrary other options into this as well as modify the `options` object for your own purposes.
 
 ## grid.projectHexToPlanar(gx, gy, width, result)
 
