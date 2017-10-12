@@ -39,7 +39,7 @@ The `options` parameter of HexTools.createGrid() supports the following paramete
 
 ## grid.cells
 
-(↳ array) The x by y array used to store the individual cells of the grid.
+(⇌ array) The x by y array used to store the individual cells of the grid.
 
 ## grid.createDrawPath(width)
 
@@ -92,7 +92,7 @@ Note: To avoid spamming the garbage collector with bound versions of `f`, `grid.
 
 ## grid.height
 
-(↳ number) The `y` dimension of the grid (read-only).
+(⇌ number) The `y` dimension of the grid (read-only).
 
 ## grid.heightFromWith(width)
 
@@ -114,7 +114,7 @@ Calls the function `f` on all neighbors of the `cell`.
 
 ## grid.options 
 
-(↳ object/hashmap) These are the options passed into the grid with `HexTools.createGrid()` (see there). You can pass arbitrary other options into this as well as modify the `options` object for your own purposes.
+(⇌ object/hashmap) These are the options passed into the grid with `HexTools.createGrid()` (see there). You can pass arbitrary other options into this as well as modify the `options` object for your own purposes.
 
 ## grid.projectHexToPlanar(gx, gy, width, result)
 
@@ -159,4 +159,4 @@ Calls the function `f` on all neighbors of the `cell`.
 
 ## grid.width 
 
-(↳ number) The `x` dimension of the grid (read-only).
+(⇌ number) The `x` dimension of the grid (read-only).
