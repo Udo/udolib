@@ -35,15 +35,15 @@ The `options` parameter of HexTools.createGrid() supports the following paramete
 
 ## grid.call(x, y, f)
 
-Calls the function `f` using the cell at `x`:`y` and coordinates as its parameters, and returns the result. If the coordinates are outside the grid's dimension, this returns the `false` value. The expected signature of `f` is `f(cell, x, y)`. Refer to the section on `grid.each()` for a note on the binding of the `this` keyword in `f`.
+(↳ return value of f) Calls the function `f` using the cell at `x`:`y` and coordinates as its parameters, and returns the result. If the coordinates are outside the grid's dimension, this returns the `false` value. The expected signature of `f` is `f(cell, x, y)`. Refer to the section on `grid.each()` for a note on the binding of the `this` keyword in `f`.
 
 ## grid.cells
 
-(array) The x by y array used to store the individual cells of the grid.
+(↳ array) The x by y array used to store the individual cells of the grid.
 
 ## grid.createDrawPath(width)
 
-(array) Returns an array containing a vector path describing a single hex based on the specified width.
+(↳ array) Returns an array containing a vector path describing a single hex based on the specified width.
 
 #### Example: Drawing a Pointy-Topped Grid in PIXI.JS
 
@@ -78,7 +78,7 @@ Calls the function `f` using the cell at `x`:`y` and coordinates as its paramete
 
 ## grid.distance(x1, y1, x2, y2)
 
-(number) Returns the distance between the hex cells `x1:y1` and `x2:y2`.
+(↳ number) Returns the distance between the hex cells `x1:y1` and `x2:y2`.
 
 ## grid.each(f)
 
@@ -88,15 +88,15 @@ Note: To avoid spamming the garbage collector with bound versions of `f`, `grid.
 
 ## grid.get(x, y)
 
-(cell object) Returns the cell at `x`:`y`. If the coordinates are outside the grid's dimension, this returns the `false` value.
+(↳ cell object) Returns the cell at `x`:`y`. If the coordinates are outside the grid's dimension, this returns the `false` value.
 
 ## grid.height
 
-(number) The `y` dimension of the grid (read-only).
+(↳ number) The `y` dimension of the grid (read-only).
 
 ## grid.heightFromWith(width)
 
-(number) Returns the height of a hex based on its width.
+(↳ number) Returns the height of a hex based on its width.
 
 ## grid.neighborsOf(cell, f) 
 
@@ -114,15 +114,15 @@ Calls the function `f` on all neighbors of the `cell`.
 
 ## grid.options 
 
-(object/hashmap) These are the options passed into the grid with `HexTools.createGrid()` (see there). You can pass arbitrary other options into this as well as modify the `options` object for your own purposes.
+(↳ object/hashmap) These are the options passed into the grid with `HexTools.createGrid()` (see there). You can pass arbitrary other options into this as well as modify the `options` object for your own purposes.
 
 ## grid.projectHexToPlanar(gx, gy, width, result)
 
-(object) Returns the x and y coordinates of a given hex cell on a planar map (or modifies the supplied `result` parameter). The result is an object with an `x` and a `y` field holding the values. This is useful for drawing a graphical map of the grid.
+(↳ object) Returns the x and y coordinates of a given hex cell on a planar map (or modifies the supplied `result` parameter). The result is an object with an `x` and a `y` field holding the values. This is useful for drawing a graphical map of the grid.
 
 ## grid.projectPlanarToHex(px, py, width, result)
 
-(object) Given the the planar map coordinates `px` and `py` and the `width` of an individual hex, this function returns the grid x and y of the hex cell those coordinates fall into. This is useful, for example, to find the hex below the mouse pointer on a map.
+(↳ object) Given the the planar map coordinates `px` and `py` and the `width` of an individual hex, this function returns the grid x and y of the hex cell those coordinates fall into. This is useful, for example, to find the hex below the mouse pointer on a map.
 
 #### Example: Mouse-Over Highlighting in PIXI.JS
 
@@ -155,8 +155,8 @@ Calls the function `f` on all neighbors of the `cell`.
 
 ## grid.rowHeightFromWith(width)
 
-(number) Returns the distance between hex rows based on the width of an individual hex.
+(↳ number) Returns the distance between hex rows based on the width of an individual hex.
 
 ## grid.width 
 
-(number) The `x` dimension of the grid (read-only).
+(↳ number) The `x` dimension of the grid (read-only).
