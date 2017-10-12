@@ -33,13 +33,16 @@ var HexTools = {
       each : function(f) {
         grid.cells.forEach(function(row, rowIndex) {
           row.forEach(function(cell, colIndex) {
-            f(cell, rowIndex, colIndex);
+            f(cell, colIndex, rowIndex);
           });
         });
       },
     }
     for(var prop in options.type) if(options.type.hasOwnProperty(prop)) {
       grid[prop] = options.type[prop].bind(grid); 
+    }
+    if(options.functions) for(var prop in options.functions) if(options.functions.hasOwnProperty(prop)) {
+      grid[prop] = options.functions[prop].bind(grid); 
     }
     for(var y = 0; y < height; y++) {
       grid.cells[y] = [];
@@ -116,7 +119,9 @@ var HexTools = {
         return(optionalDestination);
       },
       
-      projectPlanarToHex : function(xc, yc, cellSize) {
+      projectPlanarToHex : function(xc, yc, cellSize, optionalDestination) {
+        if(!optionalDestination)
+          optionalDestination = {};
         var options = this.options || HexTools.options;
         var cellWidth = cellSize;
         var cellHeight = HexTools.graphics.pointyTop.rowHeightFromWidth(cellSize);
@@ -129,7 +134,9 @@ var HexTools = {
           y -= 1;
           x += (Math.round(y) % 2 == 0 ? -options.evenOffset : -options.oddOffset) + (fx > 0 ? 1 : 0);
         }
-        return({ x : Math.round(x), y : Math.round(y) });
+        optionalDestination.x = Math.round(x);
+        optionalDestination.y = Math.round(y);
+        return(optionalDestination);
       },
       
     },
