@@ -45,7 +45,7 @@ Calls the function `f` using the cell at `x`:`y` and coordinates as its paramete
 
 Returns an array containing a vector path describing a single hex based on the specified width.
 
-### Example: Drawing a Pointy-Topped Grid in PIXI.JS
+#### Example: Drawing a Pointy-Topped Grid in PIXI.JS
 
 ```javascript
   
@@ -78,7 +78,7 @@ Returns an array containing a vector path describing a single hex based on the s
 
 ## grid.distance(x1, y1, x2, y2)
 
-Returns the distance between the hex cells `x1:y1` and `x2:y2`.
+(number) Returns the distance between the hex cells `x1:y1` and `x2:y2`.
 
 ## grid.each(f)
 
@@ -102,7 +102,7 @@ Returns the height of a hex based on its width.
 
 Calls the function `f` on all neighbors of the `cell`.
 
-### Example: Highlight the Neighbors of a Hex in PIXI.JS
+#### Example: Highlight the Neighbors of a Hex in PIXI.JS
 
 ```javscript
 
@@ -124,10 +124,10 @@ Returns the x and y coordinates of a given hex cell on a planar map (or modifies
 
 Given the the planar map coordinates `px` and `py` and the `width` of an individual hex, this function returns the grid x and y of the hex cell those coordinates fall into. This is useful, for example, to find the hex below the mouse pointer on a map.
 
-### Example: Mouse-Over Highlighting in PIXI.JS
+#### Example: Mouse-Over Highlighting in PIXI.JS
 
 ```javascript
-
+  
   function MakeInteractive(container, grid) {
     
     container.interactive = true;
@@ -155,7 +155,7 @@ Given the the planar map coordinates `px` and `py` and the `width` of an individ
 
 ## grid.rowHeightFromWith(width)
 
-Returns the distance between hex rows based on the width of an individual hex.
+(number) Returns the distance between hex rows based on the width of an individual hex.
 
 ## grid.width 
 
