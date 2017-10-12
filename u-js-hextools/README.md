@@ -43,7 +43,7 @@ Calls the function `f` using the cell at `x`:`y` and coordinates as its paramete
 
 ## grid.createDrawPath(width)
 
-Returns an array containing a vector path describing a single hex based on the specified width.
+(array) Returns an array containing a vector path describing a single hex based on the specified width.
 
 #### Example: Drawing a Pointy-Topped Grid in PIXI.JS
 
@@ -88,7 +88,7 @@ Note: To avoid spamming the garbage collector with bound versions of `f`, `grid.
 
 ## grid.get(x, y)
 
-Returns the cell at `x`:`y`. If the coordinates are outside the grid's dimension, this returns the `false` value.
+(cell object) Returns the cell at `x`:`y`. If the coordinates are outside the grid's dimension, this returns the `false` value.
 
 ## grid.height
 
@@ -96,7 +96,7 @@ Returns the cell at `x`:`y`. If the coordinates are outside the grid's dimension
 
 ## grid.heightFromWith(width)
 
-Returns the height of a hex based on its width.
+(number) Returns the height of a hex based on its width.
 
 ## grid.neighborsOf(cell, f) 
 
@@ -118,11 +118,11 @@ Calls the function `f` on all neighbors of the `cell`.
 
 ## grid.projectHexToPlanar(gx, gy, width, result)
 
-Returns the x and y coordinates of a given hex cell on a planar map (or modifies the supplied `result` parameter). The result is an object with an `x` and a `y` field holding the values. This is useful for drawing a graphical map of the grid.
+(object) Returns the x and y coordinates of a given hex cell on a planar map (or modifies the supplied `result` parameter). The result is an object with an `x` and a `y` field holding the values. This is useful for drawing a graphical map of the grid.
 
 ## grid.projectPlanarToHex(px, py, width, result)
 
-Given the the planar map coordinates `px` and `py` and the `width` of an individual hex, this function returns the grid x and y of the hex cell those coordinates fall into. This is useful, for example, to find the hex below the mouse pointer on a map.
+(object) Given the the planar map coordinates `px` and `py` and the `width` of an individual hex, this function returns the grid x and y of the hex cell those coordinates fall into. This is useful, for example, to find the hex below the mouse pointer on a map.
 
 #### Example: Mouse-Over Highlighting in PIXI.JS
 
