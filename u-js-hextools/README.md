@@ -25,13 +25,13 @@ The `options` parameter of HexTools.createGrid() supports the following paramete
 
 - `functions` (default: none) A place to define custom functions that should be included in the returned grid object. The functions featured in this option will be applied and bound to the resulting grid object (binding the `this` parameter to the grid object).
 
-- `oddOffset` (default: 0) this is an `x` offset for odd rows. This information is used by topological functions such as `neighborsOf()` to determine what the layout of the grid represents.
+- `oddOffset` (default: 0) this is an `x` offset for odd rows. This information is used by topological functions such as `eachNeighborOf()` to determine what the layout of the grid represents.
 
 - `evenOffset` (default: 1) same as `oddOffset` but for even rows.
 
 - `onCreateCell` (default: none) This is an optional callback function that will be invoked on each cell when the grid is created. The expected signature of the function is `f(cell)`. 
 
-- `type` (default: `HexTools.graphics.pointyTop`) contains functions that allows HexTools to work with hex graphics and topology based on the orientation of the hexes. By default, this creates a grid for hexes standing upright on their pointy side. The other supported option for this is for a grid where the hexes lie flat: `HexTools.graphics.flatTop`. The functions featured in this option will be applied and bound to the resulting grid object (binding the `this` parameter to the grid object).
+- `type` (default: `HexTools.pointyTop`) contains functions that allows HexTools to work with hex graphics and topology based on the orientation of the hexes. By default, this creates a grid for hexes standing upright on their pointy side. The other supported option for this is for a grid where the hexes lie flat: `HexTools.flatTop`. The functions featured in this option will be applied and bound to the resulting grid object (binding the `this` parameter to the grid object).
 
 ## grid.call(x, y, f)
 
@@ -53,7 +53,7 @@ The `options` parameter of HexTools.createGrid() supports the following paramete
     cellSize : 64, 
     evenOffset : 1, 
     oddOffset : 0, 
-    type : HexTools.graphics.pointyTop,
+    type : HexTools.pointyTop,
     functions : {
 
       drawHex : function(cell) {
@@ -86,6 +86,24 @@ Iterates over all the cells in the grid and calls the function `f` on them. The 
 
 Note: To avoid spamming the garbage collector with bound versions of `f`, `grid.each()` does not bind the `this` keyword inside `f` to the grid object. However, if `f` is provided to `createGrid()`'s custom `functions`, it will already be `this`-bound.
 
+## grid.eachInAreaOf(cell, radius, f) 
+
+Calls the function `f` on all cells in the area of `cell`, within a distance of `radius`. The expected signature of `f` is `function(cell, distanceToCenter)`.
+
+## grid.eachNeighborOf(cell, f) 
+
+Calls the function `f` on all neighbors of the `cell`.
+
+#### Example: Highlight the Neighbors of a Hex in PIXI.JS
+
+```javscript
+
+  grid.eachNeighborOf(grid.get(4, 3), function(cell) {
+    cell.g.tint = 0xff88ff;
+  });
+      
+```
+
 ## grid.get(x, y)
 
 (↳ cell object) Returns the cell at `x`:`y`. If the coordinates are outside the grid's dimension, this returns the `false` value.
@@ -97,20 +115,6 @@ Note: To avoid spamming the garbage collector with bound versions of `f`, `grid.
 ## grid.heightFromWith(width)
 
 (↳ number) Returns the height of a hex based on its width.
-
-## grid.neighborsOf(cell, f) 
-
-Calls the function `f` on all neighbors of the `cell`.
-
-#### Example: Highlight the Neighbors of a Hex in PIXI.JS
-
-```javscript
-
-  grid.neighborsOf(grid.get(4, 3), function(cell) {
-    cell.g.tint = 0xff88ff;
-  });
-      
-```
 
 ## grid.options 
 
