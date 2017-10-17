@@ -6,7 +6,7 @@ var HexTools = {
   },
   
   /* creates a hex grid backing store */
-  createGrid : function(width, height, options) {
+  createGrid : function(colCount, rowCount, options) {
     var setDefaultValue = function(container, varName, value) {
       if(typeof container[varName] == 'undefined')
         container[varName] = value;
@@ -16,17 +16,17 @@ var HexTools = {
     setDefaultValue(options, 'evenOffset', 1);
     setDefaultValue(options, 'type', HexTools.pointyTop);
     var grid = {
-      width : width,
-      height : height,
+      colCount : colCount,
+      rowCount : rowCount,
       cells : [],
       options : options,
       get : function(x, y) {
-        if(x > width-1 || x < 0 || y > height-1 || y < 0)
+        if(x > colCount-1 || x < 0 || y > rowCount-1 || y < 0)
           return(false);
         return(grid.cells[y][x]);
       },
       call : function(x, y, f) {
-        if(x > width-1 || x < 0 || y > height-1 || y < 0)
+        if(x > colCount-1 || x < 0 || y > rowCount-1 || y < 0)
           return(false);
         return(f(grid.cells[y][x], x, y));
       },
@@ -51,13 +51,14 @@ var HexTools = {
       grid[prop] = options.functions[prop].bind(grid); 
     }
     // init all the cells
-    for(var y = 0; y < height; y++) {
+    for(var y = 0; y < rowCount; y++) {
       grid.cells[y] = [];
-      for(var x = 0; x < width; x++) {
+      for(var x = 0; x < colCount; x++) {
         var cell = {
             x : x,
             y : y,
           };
+        cell.pos = grid.projectHexToMap(cell.x, cell.y, options.cellSize || 1.0);
         if(options.onCreateCell)
           options.onCreateCell(cell);
         grid.cells[y][x] = cell;
@@ -67,6 +68,8 @@ var HexTools = {
   },
 
   sqrt3 : Math.sqrt(3),
+  pi6th : Math.PI/6,
+  pi12th : Math.PI/12,
   
   generic : {
 
@@ -94,10 +97,62 @@ var HexTools = {
       }
     },
     
+    eachInLine : function(c1, c2, eachCellCallback) {
+      var cc = c1;
+      var grid = this;
+      var distCounter = 0;
+      var distLength = 0;
+      var pvx = c2.pos.x - c1.pos.x;
+      var pvy = c2.pos.y - c1.pos.y;
+      var pvlength = grid.mapDistance(0, 0, pvx, pvy);
+      pvx = pvx / pvlength;
+      pvy = pvy / pvlength;
+      var unitLength = grid.options.cellSize || 1.0;
+      if(eachCellCallback)
+        eachCellCallback(cc, distCounter);
+      while(cc.x != c2.x || cc.y != c2.y) {
+        distLength += unitLength;
+        distCounter += 1;
+        var closestCell = false;
+        var closestSquareDist = false;
+        var referencePositionX = c1.pos.x + (pvx * distLength);
+        var referencePositionY = c1.pos.y + (pvy * distLength);
+        grid.eachNeighborOf(cc, function(nc) {
+          var ncdist = grid.mapDistance(nc.pos.x, nc.pos.y, referencePositionX, referencePositionY);
+          if(closestSquareDist === false || ncdist < closestSquareDist) {
+            closestSquareDist = ncdist;
+            closestCell = nc;
+          }
+        });
+        if(closestCell) {
+          if(eachCellCallback)
+            eachCellCallback(closestCell, distCounter);
+          cc = closestCell;
+          distLength = grid.mapDistance(c1.pos.x, c1.pos.y, cc.pos.x, cc.pos.y);
+        } else {
+          return(distCounter);
+        }
+      }
+      return(distCounter);
+    },
+    
+    stepDistance : function(c1, c2) {
+      return(this.eachInLine(c1, c2)-1);
+    },
+
+    mapDistance : function(x1, y1, x2, y2) {
+      if(x1.pos && y1.pos) {
+        return(this.mapDistance(x1.pos.x, x1.pos.y, y1.pos.x, y1.pos.y));
+      }
+      var dx = x1 - x2;
+      var dy = y1 - y2;
+      return(Math.sqrt(dx*dx + dy*dy));
+    },
+    
   },
   
   pointyTop : {
-
+    
     eachNeighborOf : function(cell, eachNeighborCallback) {
       var options = this.options || HexTools.options;
       var x = cell.x;
@@ -109,15 +164,6 @@ var HexTools = {
       this.call(offset1+x+0, y+1, eachNeighborCallback);
       this.call(offset1+x-1, y+1, eachNeighborCallback);
       this.call(x-1, y+0, eachNeighborCallback);
-    },
-    
-    distance : function(hx1, hy1, hx2, hy2) {
-      var options = this.options || HexTools.options;
-      hx1 += (hy1 % 2 != 0 ? options.oddOffset/2 : options.evenOffset/2);
-      hx2 += (hy2 % 2 != 0 ? options.oddOffset/2 : options.evenOffset/2);
-      var dx = hx1 - hx2;
-      var dy = hy1 - hy2;
-      return(Math.sqrt(dx*dx + dy*dy));
     },
     
     heightFromWidth : function(width) {
@@ -142,22 +188,24 @@ var HexTools = {
       ]);  
     },
     
-    projectHexToPlanar : function(hx, hy, cellSize, optionalDestination) {
-      var options = this.options || HexTools.options;
+    projectHexToMap : function(hx, hy, cellSize, optionalDestination) {
       if(!optionalDestination)
         optionalDestination = {};
-      var offset = (hy % 2 != 0 ? options.oddOffset/2 : options.evenOffset/2);
-      optionalDestination.y = hy * HexTools.pointyTop.rowHeightFromWidth(cellSize);
-      optionalDestination.x = (hx + offset) * cellSize;
-      return(optionalDestination);
+      return(HexTools.abstract.projectHexToMap(
+        hy, hx, 
+        cellSize || this.options.cellSize, 
+        optionalDestination, 
+        'y', 'x', 
+        HexTools.pointyTop.rowHeightFromWidth, 
+        this.options || HexTools.options));
     },
     
-    projectPlanarToHex : function(xc, yc, cellSize, optionalDestination) {
+    projectMapToHex : function(xc, yc, cellSize, optionalDestination) {
       if(!optionalDestination)
         optionalDestination = {};
       var options = this.options || HexTools.options;
-      var cellWidth = cellSize;
-      var cellHeight = HexTools.pointyTop.rowHeightFromWidth(cellSize);
+      var cellWidth = cellSize || options.cellSize;
+      var cellHeight = HexTools.pointyTop.rowHeightFromWidth(cellWidth);
       var y = (yc / cellHeight) + 1/6;
       var x = (xc / cellWidth) - 
         (Math.round(y) % 2 == 0 ? options.evenOffset*0.5 : options.oddOffset*0.5);
@@ -174,6 +222,19 @@ var HexTools = {
     
   },
 
+  abstract : {
+
+    projectHexToMap : function(h1, h2, cellSize, dest, f1, f2, f1DimFunction, options) {
+      if(!cellSize)
+        cellSize = options.cellSize;
+      var offset = (h1 % 2 != 0 ? options.oddOffset/2 : options.evenOffset/2);
+      dest[f1] = h1 * f1DimFunction(cellSize);
+      dest[f2] = (h2 + offset) * cellSize;
+      return(dest);
+    },
+    
+  },
+  
   flatTop : {
 
     eachNeighborOf : function(cell, eachNeighborCallback) {
@@ -189,15 +250,6 @@ var HexTools = {
       this.call(x-1, offset1+y-1, eachNeighborCallback);
     },
 
-    distance : function(hx1, hy1, hx2, hy2) {
-      var options = this.options || HexTools.options;
-      hy1 += (hx1 % 2 != 0 ? options.oddOffset/2 : options.evenOffset/2);
-      hy2 += (hx2 % 2 != 0 ? options.oddOffset/2 : options.evenOffset/2);
-      var dx = hx1 - hx2;
-      var dy = hy1 - hy2;
-      return(Math.sqrt(dx*dx + dy*dy));
-    },
-    
     widthFromHeight : function(height) {
       return(height / (HexTools.sqrt3/2));
     },
@@ -220,20 +272,22 @@ var HexTools = {
       ]);  
     },
     
-    projectHexToPlanar : function(hx, hy, cellSize, optionalDestination) {
-      var options = this.options || HexTools.options;
+    projectHexToMap : function(hx, hy, cellSize, optionalDestination) {
       if(!optionalDestination)
         optionalDestination = {};
-      var offset = (hx % 2 != 0 ? options.oddOffset/2 : options.evenOffset/2);
-      optionalDestination.x = hx * HexTools.flatTop.colWidthFromHeight(cellSize);
-      optionalDestination.y = (hy + offset) * cellSize;
-      return(optionalDestination);
+      return(HexTools.abstract.projectHexToMap(
+        hx, hy, 
+        cellSize || this.options.cellSize, 
+        optionalDestination, 
+        'x', 'y', 
+        HexTools.flatTop.colWidthFromHeight, 
+        this.options || HexTools.options));
     },
     
-    projectPlanarToHex : function(xc, yc, cellSize) {
+    projectMapToHex : function(xc, yc, cellSize) {
       var options = this.options || HexTools.options;
-      var cellHeight = cellSize;
-      var cellWidth = HexTools.flatTop.colWidthFromHeight(cellSize);
+      var cellHeight = cellSize || options.cellSize;
+      var cellWidth = HexTools.flatTop.colWidthFromHeight(cellHeight);
       var x = (xc / cellWidth) + 1/6;
       var y = (yc / cellHeight) - 
         (Math.round(x) % 2 == 0 ? options.evenOffset*0.5 : options.oddOffset*0.5);
