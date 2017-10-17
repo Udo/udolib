@@ -104,16 +104,16 @@ Note: To avoid spamming the garbage collector with bound versions of `f`, `grid.
       
 ```
 
-## grid.eachInAreaOf(cell, radius, f) 
+## grid.eachInAreaOf(cells, radius, f) 
 
-Calls the function `f` on all cells in the area of `cell`, within a distance of `radius`. The expected signature of `f` is `function(cell, distanceToCenter)`.
+Calls the function `f` on all cells in the area of the list `cells` (an array of cells), within a distance of `radius`. The expected signature of `f` is `function(cell, distanceToCenter)`.
 
 #### Example: Highlighting All Surrounding Hexes in PIXI.JS
 
 ```javscript
 
   // highlight an area with 3 hexes radius:
-  grid.eachInAreaOf(grid.get(4, 3), 3, function(cell) {
+  grid.eachInAreaOf([grid.get(4, 3)], 3, function(cell) {
     // highlight every hex within that area:
     cell.g.tint = 0xff88ff;
   });

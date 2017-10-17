@@ -73,11 +73,14 @@ var HexTools = {
   
   generic : {
 
-    eachInAreaOf : function(cell, depth, cellCallback) {
+    eachInAreaOf : function(cells, depth, cellCallback) {
       var visitedList = { };
-      visitedList[cell.x+':'+cell.y] = true;
-      cellCallback(cell, 0);
-      var openList = [ cell ];
+      var openList = [ ];
+      cells.forEach(function(cell) {
+        visitedList[cell.x+':'+cell.y] = true;
+        cellCallback(cell, 0);
+        openList.push(cell);
+      });
       var grid = this;
       var vHash = false;
       for(var depthIndex = 0; depthIndex < depth; depthIndex++) {
