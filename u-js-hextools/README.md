@@ -108,6 +108,8 @@ Note: To avoid spamming the garbage collector with bound versions of `f`, `grid.
 
 Calls the function `f` on all cells in the area of the list `cells` (an array of cells), within a distance of `radius`. The expected signature of `f` is `function(cell, distanceToCenter)`.
 
+![eachInAreaOf example](https://github.com/Udo/udolib/blob/master/u-js-hextools/hextools-example-eachinareaof.png?raw=true "Udolib eachInAreaOf() example")
+
 #### Example: Highlighting All Surrounding Hexes in PIXI.JS
 
 ```javscript
@@ -123,6 +125,8 @@ Calls the function `f` on all cells in the area of the list `cells` (an array of
 ## grid.eachInLine(c1, c2, f) 
 
 Calls the function `f` on all cells along a straight path from `cell` c1 to c2. The expected signature of `f` is `function(cell, stepCount)`.
+
+![eachInLine example](https://github.com/Udo/udolib/blob/master/u-js-hextools/hextools-example-eachinline.png?raw=true "Udolib eachInLine() example")
 
 #### Example: Drawing a Line on the Hex Map in PIXI.JS
 
