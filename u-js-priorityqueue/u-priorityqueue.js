@@ -2,7 +2,6 @@
  * Udolib JavaScript Priority Queue
  * (c) Udo Schroeter udo@openfu.com
  * License: Public Domain
- * losely based on https://github.com/lemire/FastPriorityQueue.js
 */
 
 var PriorityQueue = {
