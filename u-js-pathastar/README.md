@@ -1,4 +1,4 @@
-# Udolib A-Star Pathfinder
+# Udolib A-Star Pathfinder - Basic Usage
 
 Dependencies: Udolib PriorityQueue
 
@@ -20,7 +20,7 @@ Assumptions:
 
 ![Path finding example](https://github.com/Udo/udolib/blob/master/u-js-pathastar/pathastar-example1.png?raw=true "Udolib A-Star Pathfinder")
 
-## Basic Usage
+## PathAStar.find()
 
 ```javascript
 // finding a path from startNode to endNode
@@ -108,6 +108,8 @@ var amorphousNeighborExample = function(node, f) {
 }
 ```
 
+# Custom Options
+
 ## Custom Movement Cost
 
 By default, Udolib's PathAStar finder assumes each node has an `x` and a `y` field representing the node's position on a flat 2D map, to make the most common use case easier to deal with. This default function is used _both_ for calculating the movement cost between any two nodes _and_ as a heuristic for the total distance between any two nodes in the graph. The default implementation is stored in `PathAStar.config.defaultLinearDistance` and looks like this:
@@ -160,8 +162,14 @@ The A* algorithm uses a heuristic function to determine the approximate distance
 Invoking `find()` with a custom movement cost _and_ custom heuristic function works like so:
 
 ```javascript
-// finding a path from startNode to endNode, using a custom movement cost function
-var pfResult = PathAStar.find( startNode, endNode, eachNeighbor, myMovementCostFunction, myHeuristic );
+  // finding a path from startNode to endNode, using a custom movement cost function
+  var myHeuristic = function(fromNode, toNode) {
+    var dx = fromNode.x - toNode.x;
+    var dy = fromNode.y - toNode.y;
+    return(Math.sqrt(
+      (dx*dx)+(dy*dy)
+      ));
+  var pfResult = PathAStar.find( startNode, endNode, eachNeighbor, myMovementCostFunction, myHeuristic );
 ```
 
 Keep in mind that the heuristic function must be able to return a reasonable distance approximation between any two nodes in the graph.
