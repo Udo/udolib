@@ -316,7 +316,6 @@ You can set up custom movement costs however you like, you only need to supply a
   var hg = HexTools.createGrid(16, 14, { 
     type : HexTools.pointyTop,
     onCreateCell : function(cell) {
-      cell.isPassable = Math.random() < 0.5 || (cell.x % 2);
       cell.terrainDifficulty = 1 + Math.random()*4;
     },
     });
@@ -330,12 +329,7 @@ Based on this `terrainDifficulty` level, we can then provide a custom movement c
   var pfResult = PathAStar.find(
     hg.get(1,1), // <-- start node
     hg.get(9,6), // <-- end node
-    function(node, f) { // <-- function that calls f() on all neighbors of node
-      hg.eachNeighborOf(node, function(nb) {
-        if(nb.isPassable)
-          f(nb);
-        });
-      },
+    hg.eachNeighborOf, // <-- function that calls f() on all neighbors of node
     function(cell1, cell2) { // <-- costing function
       return(cell2.terrainDifficulty);
       },
