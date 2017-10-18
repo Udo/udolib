@@ -299,8 +299,8 @@ While the example above does produce meaningful results, it does use PathAStar.f
           f(nb);
         });
       },
-    false, // <-- slot for custom costing function, empty for now
-    hg.mapDistance // <-- custom distance heuristic       
+    false, // <-- slot for costing function, empty for now
+    hg.mapDistance // <-- distance heuristic       
     );
 
 ```
@@ -336,10 +336,10 @@ Based on this `terrainDifficulty` level, we can then provide a custom movement c
           f(nb);
         });
       },
-    function(cell1, cell2) { // <-- custom costing function
+    function(cell1, cell2) { // <-- costing function
       return(cell2.terrainDifficulty);
       },
-    hg.mapDistance // <-- custom distance heuristic       
+    hg.mapDistance // <-- distance heuristic       
     );
 
 ```
