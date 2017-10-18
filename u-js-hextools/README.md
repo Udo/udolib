@@ -1,6 +1,6 @@
-# Udolib Hex Tools
+# Udolib Hex Tools - Basic Usage
 
-Optional dependencies: Udolib PriorityQueue, PathAStar
+Dependencies: none
 
 This is a collection of things that come in handy when dealing with 2D hex maps.
 
@@ -132,7 +132,7 @@ Calls the function `f` on all cells along a straight path from `cell` c1 to c2. 
 
 ```javscript
 
-  grid.eachInLine(grid.get(4, 3), grid.get(9, 5), function(cell) {
+  grid.eachInLine(grid.get(4, 3), grid.get(9, 5), function(cell, distance) {
     // highlight every hex on the line:
     cell.g.tint = 0xff88ff;
   });
@@ -147,7 +147,7 @@ Calls the function `f` on all neighbors of the `cell`.
 
 ```javscript
 
-  grid.eachNeighborOf(grid.get(4, 3), function(cell) {
+  grid.eachNeighborOf(grid.get(4, 3), function(cell, distance) {
     // highlight every neighbor cell:
     cell.g.tint = 0xff88ff;
   });
@@ -222,4 +222,130 @@ Calls the function `f` on all neighbors of the `cell`.
 ## grid.rowCount
 
 (⇌ number) The number of rows the grid has (read-only).
+
+# Using HexTools with PathAStar Finder
+
+Dependencies: Udolib PriorityQueue, PathAStar
+
+![PathAStar example](https://github.com/Udo/udolib/blob/master/u-js-hextools/hextools-example-pathastar.png?raw=true "Udolib PathAStar example")
+
+## Setting Things Up
+
+To use pathfinding, hexes need some concept of passability (or a movement cost that differs from hex cell to hex cell, see below for examples of that). How you implement this is up to you, but here is an example that sets up a pseudo-random passability rule for each cell, using a custom cell property called `isPassable`:
+
+```javascript
+  
+  var hg = HexTools.createGrid(16, 14, { 
+    type : HexTools.pointyTop,
+    onCreateCell : function(cell) {
+      cell.isPassable = Math.random() < 0.3 || (cell.x % 2);
+    },
+    });
+
+```
+
+## Querying For a Path
+
+Udolib's PathAStar.find() function can traverse any graph, so it is quite easy to set it up for a hexmap graph. The function expects at least 3 arguments: a start node, a target node, and a function that enumerates the reachable neighbors of any given node.
+
+To continue the example above, here is an example case that uses HexTools' `grid.eachNeighborOf()` function:
+
+```javascript
+  
+  var pfResult = PathAStar.find(
+    hg.get(1,1), // <-- start node
+    hg.get(9,6), // <-- end node
+    function(node, f) { // <-- function that calls f() on all neighbors of node
+      hg.eachNeighborOf(node, function(nb) {
+        if(nb.isPassable)
+          f(nb);
+        });
+      }          
+    );
+
+```
+
+## Interpreting the Result
+
+PathAStar.find() returns an object detailing the path that was found to be the shortest (if a path has been found). An example result might look like this:
+
+```
+{
+  debug : {
+    highWaterMark: 13,
+    nodesConsidered: 42,
+    time: 0.0008,
+    totalCost: 12.82
+  },
+    
+  path : [array of cells forming the path]   
+}
+```
+
+Refer to the PathAStar documentation for more information about the pathfinding result.
+
+## Using a Proper Distance Heuristic
+
+While the example above does produce meaningful results, it does use PathAStar.find()'s default distance heuristic which interprets the `x` and `y` properties of each hex cell - which does not accurately reflect a hex' position on a map. To alleviate this, we can provide the grid's built-in distance function as a custom heuristic like so:
+
+```javascript
+  
+  var pfResult = PathAStar.find(
+    hg.get(1,1), // <-- start node
+    hg.get(9,6), // <-- end node
+    function(node, f) { // <-- function that calls f() on all neighbors of node
+      hg.eachNeighborOf(node, function(nb) {
+        if(nb.isPassable)
+          f(nb);
+        });
+      },
+    false, // <-- slot for custom costing function, empty for now
+    hg.mapDistance // <-- custom distance heuristic       
+    );
+
+```
+
+![PathAStar example](https://github.com/Udo/udolib/blob/master/u-js-hextools/hextools-example-pathastar-distheuristic.png?raw=true "Udolib PathAStar example")
+
+## Using a Custom Movement Costing Function
+
+You can set up custom movement costs however you like, you only need to supply a function that can return the movement cost between any two neighboring nodes. For example, let's say we create a hex map where every cell has its own terrain difficulty:
+
+```javascript
+  
+  var hg = HexTools.createGrid(16, 14, { 
+    type : HexTools.pointyTop,
+    onCreateCell : function(cell) {
+      cell.isPassable = Math.random() < 0.5 || (cell.x % 2);
+      cell.terrainDifficulty = 1 + Math.random()*4;
+    },
+    });
+
+```
+
+Based on this `terrainDifficulty` level, we can then provide a custom movement cost function:
+
+```javascript
+  
+  var pfResult = PathAStar.find(
+    hg.get(1,1), // <-- start node
+    hg.get(9,6), // <-- end node
+    function(node, f) { // <-- function that calls f() on all neighbors of node
+      hg.eachNeighborOf(node, function(nb) {
+        if(nb.isPassable)
+          f(nb);
+        });
+      },
+    function(cell1, cell2) { // <-- custom costing function
+      return(cell2.terrainDifficulty);
+      },
+    hg.mapDistance // <-- custom distance heuristic       
+    );
+
+```
+
+Note: the values returned by the movement cost function should never be lower than the guesses returned by the distance heuristic function. 
+
+![PathAStar example](https://github.com/Udo/udolib/blob/master/u-js-hextools/hextools-example-pathastar-costing.png?raw=true "Udolib PathAStar example")
+
 

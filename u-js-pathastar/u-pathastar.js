@@ -63,7 +63,7 @@ var PathAStar = {
           result : 'path', 
           debug : {
             time : (performance.now() - startTime) / 1000,
-            highwaterMark : countHighWatermark,
+            highWaterMark : countHighWatermark,
             nodesConsidered : countConsidered,
             totalCost : costSoFar[currentNode.id],
           },
