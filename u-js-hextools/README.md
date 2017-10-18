@@ -100,7 +100,7 @@ Note: To avoid spamming the garbage collector with bound versions of `f`, `grid.
 
   grid.each(function(cell) {
     console.log(cell.x, cell.y, 'is at map position', cell.pos);
-  });
+    });
       
 ```
 
@@ -118,7 +118,7 @@ Calls the function `f` on all cells in the area of the list `cells` (an array of
   grid.eachInAreaOf([grid.get(4, 3)], 3, function(cell) {
     // highlight every hex within that area:
     cell.g.tint = 0xff88ff;
-  });
+    });
       
 ```
 
@@ -135,7 +135,7 @@ Calls the function `f` on all cells along a straight path from `cell` c1 to c2. 
   grid.eachInLine(grid.get(4, 3), grid.get(9, 5), function(cell, distance) {
     // highlight every hex on the line:
     cell.g.tint = 0xff88ff;
-  });
+    });
       
 ```
 
@@ -150,7 +150,7 @@ Calls the function `f` on all neighbors of the `cell`.
   grid.eachNeighborOf(grid.get(4, 3), function(cell, distance) {
     // highlight every neighbor cell:
     cell.g.tint = 0xff88ff;
-  });
+    });
       
 ```
 
@@ -239,7 +239,7 @@ To use pathfinding, hexes need some concept of passability (or a movement cost t
     type : HexTools.pointyTop,
     onCreateCell : function(cell) {
       cell.isPassable = Math.random() < 0.3 || (cell.x % 2);
-    },
+      },
     });
 
 ```
