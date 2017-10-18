@@ -7,9 +7,8 @@ This is a collection of things that come in handy when dealing with 2D hex maps.
 ## HexTools.createGrid() - Creating a Hex Grid Backing Store
 
 ```javascript
-  HexTools.createGrid = function(width, height, options)
-
-  // Example
+  // HexTools.createGrid = function(width, height, options)
+  // Example:
   var hg = HexTools.createGrid(32, 32);
 ```
 
