@@ -18,6 +18,10 @@
 
 Executes `f` with the signature `function(value, index) {...}` on every item within `obj`. `obj` can be an array or an object.
 
+### keys(o)
+
+(↳ array) Returns an array containing the property keys of the object `o`.
+
 ### lerp(a, b, t)
 
 (↳ number) Lerps between the values `a` and `b`, where `t` is the distance between them on a scale of 0 to 1.0.
@@ -33,6 +37,10 @@ Merges the properties of the `source` object into the `destination` object.
 ### selectRandom(list)
 
 (↳ list item) Selects one of the items within the supplied `list` randomly and returns it.
+
+### values(o)
+
+(↳ array) Returns an array containing the property values of the object `o`.
 
 ## Colors and Graphics
 

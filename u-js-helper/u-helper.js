@@ -79,6 +79,34 @@ function each(o, f) {
   }
 }
 
+function keys(o) {
+  var result = [];
+  if(o.forEach) {
+    o.forEach(function(item, index) {
+      result.push(index);
+    });
+  } else {
+    for(var prop in o) if(o.hasOwnProperty(prop)) {
+      result.push(prop);
+    }
+  }
+  return(result);
+}
+
+function values(o) {
+  var result = [];
+  if(o.forEach) {
+    o.forEach(function(item, index) {
+      result.push(item);
+    });
+  } else {
+    for(var prop in o) if(o.hasOwnProperty(prop)) {
+      result.push(o[prop]);
+    }
+  }
+  return(result);
+}
+
 function map(o, f) {
   if(o.forEach) {
     var result = [];
