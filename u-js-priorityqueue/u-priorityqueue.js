@@ -93,6 +93,7 @@ var PriorityQueue = {
     }
 
     return(q);
+    
   },
 
 }
