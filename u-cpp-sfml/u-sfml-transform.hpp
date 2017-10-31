@@ -22,6 +22,7 @@ namespace UL
         Point2D position;
         Point2D pivot;
         Point2D scale;
+        Point2D size;
         Transform* parent = NULL;
         sf::Transform _sf_transform;
         sf::Transform _sf_combined;

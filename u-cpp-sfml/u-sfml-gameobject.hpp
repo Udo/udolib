@@ -45,9 +45,10 @@ namespace UL
         
         GameObject();
         ~GameObject();
-        unsigned int draw(sf::RenderTarget* target);
+        unsigned int draw(sf::RenderTarget* target, sf::FloatRect crop);
         void addChild(GameObject* child, bool addInFront = false);
         GameObject* addChild(bool addInFront = false);
+        void eachChild(GameObjectCallback g);
         void remove();
         void removeChildren();
         

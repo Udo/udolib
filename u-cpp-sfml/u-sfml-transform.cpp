@@ -14,7 +14,7 @@ void Transform::calculate() {
         _sf_combined = parent->_sf_combined * _sf_transform;
     } else {
         _sf_combined = _sf_transform;
-    }
+    }    
 }
 
 void Transform::update() {

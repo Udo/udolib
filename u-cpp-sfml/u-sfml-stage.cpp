@@ -18,6 +18,7 @@ double u_precision_timer() {
 
 Stage::Stage(sf::RenderWindow& window)
 {
+    animations = NULL;
     _sf_window = &window;
     _sf_window->setVerticalSyncEnabled(true);
     root = new GameObject();
@@ -140,10 +141,60 @@ Stage::time()
 }
 
 void
+Stage::addAnimation(AnimationCallback c)
+{
+    auto a = new AnimationEntry();
+    a->animationFunction = c;
+    a->next = NULL;
+    if(!animations)
+    {
+        animations = a;
+    }
+    else
+    {
+        auto aLast = animations;
+        while(aLast->next)
+            aLast = aLast->next;
+        aLast->next = a;
+    }
+}
+
+void
+Stage::animate()
+{
+    AnimationEntry* prev = NULL;
+    auto a = animations;
+    while(a)
+    {
+        auto res = a->animationFunction(u_precision_timer() - debug.frameTimeLast);
+        if(!res)
+        {
+            if(prev)
+            {
+                prev->next = a->next;
+                delete a;
+                a = prev->next;
+            }
+            else
+            {
+                animations = a->next;
+                delete a;
+                a = animations;
+            }
+        }
+        else
+        {
+            prev = a;
+            a = a->next;
+        }
+    }
+}
+
+void
 Stage::renderFrame()
 {
     _sf_window->clear(sf::Color::Black);
-    debug.drawCount = root->draw(_sf_window);
+    debug.drawCount = root->draw(_sf_window, sf::FloatRect(0, 0, 1920, 900));
     debug.cpuTime = u_precision_timer() - debug.frameTimeCurrent;
     debug.cpuUsage = (100.0 * debug.cpuTime / (debug.frameTimeCurrent - debug.frameTimeLast))*0.05 + debug.cpuUsage*0.95;
     _sf_window->display();

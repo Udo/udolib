@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include "u-sfml-types.hpp"
 #include "u-sfml-gameobject.hpp"
-#include "u-sfml-animation.hpp"
 namespace UL
 {
     
@@ -24,6 +23,7 @@ namespace UL
         typedef std::function<void (u32 button)> MouseButtonCallback;
         typedef std::function<void ()> Callback;
         typedef std::function<void ()> KeyCallback;
+        typedef std::function<bool (f64 deltaTime)> AnimationCallback;
 
         struct Debug {
             f64 frameTimeCurrent = 0;
@@ -56,9 +56,14 @@ namespace UL
             Callback frame;
         } on;
         
+        struct AnimationEntry {
+            AnimationCallback animationFunction = NULL;
+            AnimationEntry* next;
+        };
+        
         sf::RenderWindow* _sf_window;
         GameObject* root;
-        Animation* animation;
+        AnimationEntry* animations;
         sf::Event event;
         
         Stage(sf::RenderWindow& window);        
@@ -68,7 +73,9 @@ namespace UL
         void processEvents();
         void renderFrame();
         f64 time();
-        
+        void addAnimation(AnimationCallback c);
+        void animate();
+
     };
     
 }

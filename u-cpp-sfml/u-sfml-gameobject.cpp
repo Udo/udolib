@@ -32,7 +32,7 @@ GameObject::~GameObject()
     if(audioSource) delete audioSource;
 }
 
-unsigned int GameObject::draw(sf::RenderTarget* target)
+unsigned int GameObject::draw(sf::RenderTarget* target, sf::FloatRect crop)
 {
     if(!enabled)
         return(0);
@@ -42,6 +42,8 @@ unsigned int GameObject::draw(sf::RenderTarget* target)
     transform->calculate();
     if(graphics)
     {
+        auto dim = transform->_sf_combined.transformRect(sf::FloatRect(0, 0, transform->size.x+1, transform->size.y+1));
+        visible = crop.intersects(dim);
         if(visible)
         {
             target->draw(*graphics, transform->_sf_combined);
@@ -53,7 +55,7 @@ unsigned int GameObject::draw(sf::RenderTarget* target)
         GameObject* c = firstChild;
         while(c)
         {
-            result += c->draw(target);
+            result += c->draw(target, crop);
             c = c->nextSibling;
         }
     }
@@ -78,6 +80,18 @@ void GameObject::addChild(GameObject* child, bool addInFront) {
     child->transform->parent = this->transform;
     if(on.draw)
         on.draw(*child);
+}
+
+void GameObject::eachChild(GameObjectCallback g)
+{
+    auto o = firstChild;
+    while(o)
+    {
+        g(*o);
+        if(o->firstChild)
+            o->eachChild(g);
+        o = o->nextSibling;
+    }
 }
 
 GameObject* GameObject::addChild(bool addInFront) {
