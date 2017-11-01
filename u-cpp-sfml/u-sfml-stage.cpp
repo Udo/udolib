@@ -47,6 +47,17 @@ Stage::beginFrame()
 }
 
 void
+Stage::projectScreenToGameobject(f64 sx, f64 sy, GameObject* o, f64& x, f64& y)
+{
+    if(!o)
+        return;
+    auto inv = o->transform->_sf_combined.getInverse();
+    auto mp = inv.transformPoint(sx, sy);
+    x = mp.x;
+    y = mp.y;
+}
+
+void
 Stage::processEvents()
 {
     sf::Vector2i position = sf::Mouse::getPosition(*_sf_window);
@@ -91,10 +102,13 @@ Stage::processEvents()
             case sf::Event::MouseWheelScrolled: {
             } break;
             case sf::Event::MouseButtonPressed: {
+                // todo: actually finding out which button it was
+                mouse.leftButton = true;
                 if(on.mouse_down)
                     on.mouse_down(0);
             } break;
             case sf::Event::MouseButtonReleased: {
+                mouse.leftButton = false;
                 if(on.mouse_up)
                     on.mouse_up(0);
             } break;
@@ -162,6 +176,10 @@ Stage::addAnimation(AnimationCallback c)
 void
 Stage::animate()
 {
+    if(options.mouseLayer)
+    {
+        projectScreenToGameobject(mouse.x, mouse.y, options.mouseLayer, mouse.layerX, mouse.layerY);
+    }
     AnimationEntry* prev = NULL;
     auto a = animations;
     while(a)

@@ -34,10 +34,21 @@ namespace UL
             u32 frameCounter = 0;
             u32 drawCount = 0;            
         } debug;
+        
+        struct Options {
+            GameObject* mouseLayer = NULL;
+        } options;
 
         struct Mouse {
             f64 x = 0;
             f64 y = 0;
+            f64 x0 = 0;
+            f64 y0 = 0;
+            f64 layerX = 0;
+            f64 layerY = 0;
+            bool leftButton = false;
+            bool rightButton = false;
+            bool middleButton = false;
         } mouse;
         
         struct Events {
@@ -62,8 +73,8 @@ namespace UL
         };
         
         sf::RenderWindow* _sf_window;
-        GameObject* root;
-        AnimationEntry* animations;
+        GameObject* root = NULL;
+        AnimationEntry* animations = NULL;
         sf::Event event;
         
         Stage(sf::RenderWindow& window);        
@@ -75,6 +86,7 @@ namespace UL
         f64 time();
         void addAnimation(AnimationCallback c);
         void animate();
+        void projectScreenToGameobject(f64 sx, f64 sy, GameObject* o, f64& x, f64& y);
 
     };
     
