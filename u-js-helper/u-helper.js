@@ -1,3 +1,12 @@
+function bindThis(self, source, destination) {
+  if(!destination)
+    destination = {};
+  for(var prop in source) if(source.hasOwnProperty(prop)) {
+    destination[prop] = source[prop].bind(self); 
+  }
+  return(destination);
+}
+
 function rgb(r, g, b) {
 	return( b + g*256 + r*65536 );
 }
@@ -128,6 +137,10 @@ function map(o, f) {
 }
 
 function merge(dest, source) {
+  if(!dest)
+    dest = {};
+  if(!source)
+    source = {};
   for(var prop in source) if(source.hasOwnProperty(prop)) {
     dest[prop] = source[prop];
   }

@@ -1,4 +1,4 @@
-var Stage = {
+var PixiStage = {
   
   implementation : {
     
@@ -140,6 +140,22 @@ var Stage = {
         this.debug.animationTimestamp = new Date().getTime();
         this.debug.renderTimestamp = new Date().getTime();
       },
+      
+      cullInvisible : function(e) {
+        if(!e.getBounds)
+          return;
+        var bounds = e.getBounds();
+        e.renderable = 
+          bounds.x >= 0 && 
+          bounds.y >= 0 && 
+          bounds.x+bounds.width <= this.size.x && 
+          bounds.y+bounds.height <= this.size.y;
+        if(false && e.renderable) {
+          for(var i = 0; i < e.children.length; i++) {
+            this.cullInvisible(e.children[i]);
+          }
+        }
+      },
     
       renderFrame : function() {
         if(this.debug.frameSkipStatus > 0) {
@@ -156,6 +172,9 @@ var Stage = {
               this.root.scale.y = this.mouse.zoom;
         	  }
       		}		
+          if(this.options.viewCulling) {
+            this.cullInvisible(this.root);
+          } 
       		this.animation.doAll((st - this.debug.animationTimestamp) / 1000);
           this.renderer.render(this.root);      
       		const ct = new Date().getTime();
@@ -257,20 +276,22 @@ var Stage = {
         } else {
           this.mouse.otherButton = e.which+':'+e.button;
         }
-        this.mouse.x0 = this.mouse.x;
-        this.mouse.y0 = this.mouse.y;
+        this.mouse.x0 = this.mouse.screenX;
+        this.mouse.y0 = this.mouse.screenY;
         this.trigger('mousedown', this.mouse, buttonContext);        
         this.trigger('mousedown_'+buttonContext, this.mouse);        
       },
       
       mousemove : function(e) {
-        this.mouse.x = (e.data.global.x - this.root.position.x) / this.root.scale.x;
-        this.mouse.y = (e.data.global.y - this.root.position.y) / this.root.scale.y;
+        this.mouse.screenX = e.data.global.x;
+        this.mouse.screenY = e.data.global.y;
+        this.mouse.x = ((e.data.global.x - this.root.position.x) / this.root.scale.x) + this.root.pivot.x;
+        this.mouse.y = ((e.data.global.y - this.root.position.y) / this.root.scale.y) + this.root.pivot.y;
         if(this.mouse.anyButton) {
-          this.mouse.xd = this.mouse.x - this.mouse.x0;
-          this.mouse.yd = this.mouse.y - this.mouse.y0;
+          this.mouse.xd = (this.mouse.screenX - this.mouse.x0) / this.root.scale.x;
+          this.mouse.yd = (this.mouse.screenY - this.mouse.y0) / this.root.scale.y;
         }
-        this.trigger('mousemove', this.mouse);
+        this.trigger('mousemove', this.mouse, e);
       },
       
       mouseup : function(e) {
@@ -366,6 +387,8 @@ var Stage = {
       	x : 0, y : 0,
       	x0 : 0,	y0 : 0,
       	xd : 0,	yd : 0,
+      	screenX : 0,
+      	screenY : 0,
     	},    	     
       eventHandlers : { 
         click : false,
@@ -386,10 +409,10 @@ var Stage = {
   	opt.stopped = true;
   	opt.stopEvents = true;
  
-    Stage.implementation.bind(s, Stage.implementation.functions, s);
-    s.layers = Stage.implementation.bind(s, Stage.implementation.layers);    
-    s.hooks = Stage.implementation.bind(s, Stage.implementation.hooks);
-    s.animation = Stage.implementation.bind(s, Stage.implementation.animation, {
+    PixiStage.implementation.bind(s, PixiStage.implementation.functions, s);
+    s.layers = PixiStage.implementation.bind(s, PixiStage.implementation.layers);    
+    s.hooks = PixiStage.implementation.bind(s, PixiStage.implementation.hooks);
+    s.animation = PixiStage.implementation.bind(s, PixiStage.implementation.animation, {
       paused : false,
       stopped : false,
       list : [],
@@ -410,7 +433,7 @@ var Stage = {
     } else {
       s.makeDraggable(s.root, 'pivot');
     }
-  
+    
     return(s);
   	
   },

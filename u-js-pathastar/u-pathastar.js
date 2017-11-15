@@ -13,8 +13,23 @@ var PathAStar = {
     return(path.reverse());
   },
   
+  extractStepCost : function(history, endNode, idField, costSoFar) {
+    var path = [];
+    
+    var n = endNode;
+    
+    while(n) {
+      path.push(costSoFar[n[idField]]);
+      n = history[n[idField]];
+    }
+    
+    return(path.reverse());
+  },
+  
   config : {
     nodeIdField : 'id',
+    trackStepCost : false,
+    trackConsidered : false,
     defaultLinearDistance : function(fromNode, toNode) {
       var dx = fromNode.x - toNode.x;
       var dy = fromNode.y - toNode.y;
@@ -51,6 +66,7 @@ var PathAStar = {
     frontier.push(0, startNode);
     var history = {};
     var costSoFar = {};
+    var consideredNodes = [];
     costSoFar[startNode[idField]] = 1;
     history[startNode[idField]] = false;
     
@@ -64,8 +80,11 @@ var PathAStar = {
           debug : {
             time : (performance.now() - startTime) / 1000,
             highWaterMark : countHighWatermark,
+            totalCost : costSoFar[currentNode[idField]],
+            stepCost : PathAStar.config.trackStepCost ?
+              PathAStar.extractStepCost(history, endNode, idField, costSoFar) : 'not tracked',
             nodesConsidered : countConsidered,
-            totalCost : costSoFar[currentNode.id],
+            consideredNodes : consideredNodes,
           },
           path : PathAStar.extractPath(history, endNode, idField) 
           });
@@ -74,11 +93,13 @@ var PathAStar = {
         if(!nextNode)
           return;
         objectId(nextNode);
-        var newCost = costSoFar[currentNode.id] + getCost(currentNode, nextNode);
-        if(!costSoFar[nextNode.id] || newCost < costSoFar[nextNode.id]) {
+        var newCost = costSoFar[currentNode[idField]] + getCost(currentNode, nextNode);
+        if(!costSoFar[nextNode[idField]] || newCost < costSoFar[nextNode[idField]]) {
           costSoFar[nextNode[idField]] = newCost; 
           var prio = newCost + getCostHeuristic(nextNode, endNode);
           frontier.push(prio, nextNode);
+          if(PathAStar.config.trackConsidered)
+            consideredNodes.push(nextNode[idField]);
           countConsidered++;
           history[nextNode[idField]] = currentNode;
         }
@@ -90,8 +111,9 @@ var PathAStar = {
       debug : {
         time : (performance.now() - startTime) / 1000,
         highwaterMark : countHighWatermark,
-        nodesConsidered : countConsidered,
         totalCost : 0,
+        nodesConsidered : countConsidered,
+        consideredNodes : consideredNodes,
       },
       path : [] });   
   },

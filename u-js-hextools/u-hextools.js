@@ -21,12 +21,12 @@ var HexTools = {
       cells : [],
       options : options,
       get : function(x, y) {
-        if(x > colCount-1 || x < 0 || y > rowCount-1 || y < 0)
+        if(x > colCount-1 || x < 0 || y > rowCount-1 || y < 0 || isNaN(x) || isNaN(y))
           return(false);
         return(grid.cells[y][x]);
       },
       call : function(x, y, f) {
-        if(x > colCount-1 || x < 0 || y > rowCount-1 || y < 0)
+        if(x > colCount-1 || x < 0 || y > rowCount-1 || y < 0 || isNaN(x) || isNaN(y))
           return(false);
         return(f(grid.cells[y][x], x, y));
       },
@@ -72,6 +72,17 @@ var HexTools = {
   pi12th : Math.PI/12,
   
   generic : {
+    
+    data : function() {
+      return({
+        cells : this.cells,
+        colCount : this.colCount,
+        rowCount : this.rowCount,
+        cellSize : this.options.cellSize,
+        evenOffset : this.options.evenOffset,
+        oddOffset : this.options.oddOffset,
+      });
+    },
 
     eachInAreaOf : function(cells, depth, cellCallback) {
       var visitedList = { };
@@ -101,6 +112,8 @@ var HexTools = {
     },
     
     eachInLine : function(c1, c2, eachCellCallback) {
+      if(!c1 || !c2)
+        return;
       var cc = c1;
       var grid = this;
       var distCounter = 0;
@@ -169,10 +182,12 @@ var HexTools = {
       this.call(x-1, y+0, eachNeighborCallback);
     },
     
+    // todo: this needs another pass to unify both hex topology functions
     heightFromWidth : function(width) {
       return(width / (HexTools.sqrt3/2));
     },
     
+    // todo: this needs another pass to unify both hex topology functions
     rowHeightFromWidth : function(width) {
       return(width / (HexTools.sqrt3/2)) * 0.75;
     },
@@ -203,10 +218,13 @@ var HexTools = {
         this.options || HexTools.options));
     },
     
+    // todo: this needs another pass to unify both hex topology functions
     projectMapToHex : function(xc, yc, cellSize, optionalDestination) {
       if(!optionalDestination)
         optionalDestination = {};
       var options = this.options || HexTools.options;
+      if(!cellSize)
+        cellSize = options.cellSize;
       var cellWidth = cellSize || options.cellSize;
       var cellHeight = HexTools.pointyTop.rowHeightFromWidth(cellWidth);
       var y = (yc / cellHeight) + 1/6;
@@ -253,10 +271,12 @@ var HexTools = {
       this.call(x-1, offset1+y-1, eachNeighborCallback);
     },
 
+    // todo: this needs another pass to unify both hex topology functions
     widthFromHeight : function(height) {
       return(height / (HexTools.sqrt3/2));
     },
     
+    // todo: this needs another pass to unify both hex topology functions
     colWidthFromHeight : function(height) {
       return(height / (HexTools.sqrt3/2) * 0.75);
     },
@@ -287,8 +307,11 @@ var HexTools = {
         this.options || HexTools.options));
     },
     
+    // todo: this needs another pass to unify both hex topology functions
     projectMapToHex : function(xc, yc, cellSize) {
       var options = this.options || HexTools.options;
+      if(!cellSize)
+        cellSize = options.cellSize;
       var cellHeight = cellSize || options.cellSize;
       var cellWidth = HexTools.flatTop.colWidthFromHeight(cellHeight);
       var x = (xc / cellWidth) + 1/6;
