@@ -73,7 +73,16 @@ var HexTools = {
   
   generic : {
     
-    data : function() {
+    // for serialization/deserialization
+    data : function(instantiateFromData) {
+      if(instantiateFromData) {
+        this.cells = instantiateFromData.cells;
+        this.colCount = instantiateFromData.colCount;
+        this.rowCount = instantiateFromData.rowCount;
+        this.options.cellSize = instantiateFromData.cellSize;
+        this.options.evenOffset = instantiateFromData.evenOffset;
+        this.options.oddOffset = instantiateFromData.oddOffset;
+      }
       return({
         cells : this.cells,
         colCount : this.colCount,

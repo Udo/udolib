@@ -172,7 +172,9 @@ This function will move the stage root to position `x:y`, triggering the 'pan' e
 
 ## Animating Stuff with .animate(function(dt) { ... })
 
-To create an animation that gets executed on each frame, invoke `.animate(function(dt) { ... })` on your stage object. On each frame, this function will be called with the `dt` reflecting how much time has passed since the last animation frame (in seconds). The animation will run as long as the function does not return `false`. 
+To create an animation that gets executed on each frame, invoke `.animate(function(dt) { ... })` on your stage object. On each frame, this function will be called with the `dt` reflecting how much time has passed since the last animation frame (in seconds). The animation will run as long as the function does not return `false`.
+
+There can be an arbitrary number of animations active at the same time.
 
 ### Example: moving an object across the screen
 
@@ -189,9 +191,32 @@ To create an animation that gets executed on each frame, invoke `.animate(functi
 
 ````
 
+## Animation Slots
+
+Animation slots are a way of queuing up animations sequencially. Do use that feature, simply pass the optional `queueName` argument to the `animate(f, queueName)` function.
+
+### Example: two animations, sequentially executed
+
+````javascript
+
+  myStage.animate(function(deltaTime) {  
+    // ( do something )
+    if(somethingDone)
+    	return(false); // removes the current animation, implicitly starting the next 
+  }, 'my-cool-animation-slot1');
+
+  myStage.animate(function(deltaTime) {  
+    // ( do other thing )
+    if(somethingDone)
+    	return(false); // removes the current animation 
+  }, 'my-cool-animation-slot1');
+
+````
+
+
 ## Executing Stuff on the Next Frame with .once(function() { ... })
 
-This works like the `.animate(f)` function, but the function will only be executed once during the next frame.
+This works like the `.animate(f)` function, but the function will only be executed once, during the next frame.
 
 
 

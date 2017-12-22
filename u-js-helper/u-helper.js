@@ -79,6 +79,8 @@ function clamp(v, min, max) {
 }
 
 function each(o, f) {
+  if(!o)
+    return;
   if(o.forEach) {
     o.forEach(f);
   } else {

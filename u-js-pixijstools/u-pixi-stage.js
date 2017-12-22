@@ -29,7 +29,10 @@ var PixiStage = {
       if(!destination)
         destination = {};
       for(var prop in source) if(source.hasOwnProperty(prop)) {
-        destination[prop] = source[prop].bind(self); 
+        if(typeof source[prop] == 'function')
+          destination[prop] = source[prop].bind(self); 
+        else 
+          destination[prop] = source[prop];
       }
       return(destination);
     },
@@ -212,6 +215,10 @@ var PixiStage = {
   	},
 	
 	  animation : {
+  	  
+  	  list : [],
+  	  queueSlots : {},
+  	  queueSlotsActive : {},
       
       updateCachedBitmap : function(o) {
         o.cacheAsBitmap = false;
@@ -220,9 +227,23 @@ var PixiStage = {
         });
       },
   
-      add : function(f) { 
-        this.animation.list.push(f); 
-        this.trigger('animationstart', f, this.animation.list.length-1);
+      add : function(f, optionalQueueSlotID) { 
+        if(optionalQueueSlotID) {
+          f.queueSlot = optionalQueueSlotID;
+          if(this.animation.queueSlotsActive[optionalQueueSlotID]) {
+            // if there is an active animation in this slot, we need to queue
+            if(!this.animation.queueSlots[optionalQueueSlotID])
+              this.animation.queueSlots[optionalQueueSlotID] = [f];
+            else
+              this.animation.queueSlots[optionalQueueSlotID].push(f);
+          } else {
+            this.animation.queueSlotsActive[optionalQueueSlotID] = true;
+            this.animation.add(f);
+          }
+        } else {
+          this.animation.list.push(f); 
+          this.trigger('animationstart', f, this.animation.list.length-1);
+        }
       },
   
       remove : function(f) {
@@ -230,6 +251,17 @@ var PixiStage = {
         if(idx > -1) {
           this.trigger('animationend', f, idx);
           this.animation.list.splice(idx, 1);
+        }
+        if(f.queueSlot) {
+          var qs = this.animation.queueSlots[f.queueSlot];
+          if(qs && qs.length > 0) {
+            var next = qs.shift();
+            if(qs.length == 0) {
+              delete this.animation.queueSlots[f.queueSlot];
+              this.animation.queueSlotsActive[optionalQueueSlotID] = false;             
+            }
+            this.animation.add(next);
+          }
         }
       },
       
@@ -243,8 +275,11 @@ var PixiStage = {
         }
         each(this.animation.list, function(f) {
           try {
-            if(typeof f !== 'function' || f(deltaTime) === false) {
-              this.animation.remove(f);
+            if(typeof f == 'function') {
+              var r = f(deltaTime);
+              if(r === false) {
+                this.animation.remove(f);
+              }
             }
           } catch(ee) {
             console.error('error during animation', ee);
@@ -426,9 +461,10 @@ var PixiStage = {
     if(s.options.smoothScroll) {
       s.makeDraggable(s.root, 'pivotTarget');
       s.root.pivotTarget = { x : 0, y : 0 };
-      s.animation.add(function(dt) {
+      s.animate(function(dt) {
         s.root.pivot.x = (s.options.smoothScroll)*s.root.pivot.x + (1-s.options.smoothScroll)*s.root.pivotTarget.x;
         s.root.pivot.y = (s.options.smoothScroll)*s.root.pivot.y + (1-s.options.smoothScroll)*s.root.pivotTarget.y;
+        return(true);
       });
     } else {
       s.makeDraggable(s.root, 'pivot');
