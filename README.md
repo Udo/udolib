@@ -6,4 +6,4 @@ report it if you find one.
 
 # License
 
-All code and documentation are hereby released into the public domain. If you find these useful, consider a donation to my Paypal account: udo.schroeter@gmail.com
+All code and documentation are hereby released into the public domain.
