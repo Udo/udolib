@@ -146,5 +146,6 @@ function merge(dest, source) {
   for(var prop in source) if(source.hasOwnProperty(prop)) {
     dest[prop] = source[prop];
   }
+  return(dest);
 }
 

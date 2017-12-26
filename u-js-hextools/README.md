@@ -342,3 +342,17 @@ Note: the values returned by the movement cost function should never be lower th
 ![PathAStar example](https://github.com/Udo/udolib/blob/master/u-js-hextools/hextools-example-pathastar-costing.png?raw=true "Udolib PathAStar example")
 
 
+## Serializing / Deserializing
+
+Since the grid object contains both data and methods, it has a `data()` function to take care of serialization and deserialization. In theory, one might also choose to 
+just serialize the `cells` array, but in that case the grid's options must be precisely the same when re-instantiating the grid from `cells` data. Usage:
+
+```javascript
+
+  // export grid data
+  var justTheData = grid.data();
+
+  // import grid data
+  grid.data(justTheData);
+
+```
