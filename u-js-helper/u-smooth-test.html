@@ -1,0 +1,97 @@
+<html>
+
+  <body>
+  
+    <h1>Smoothing Functions</h1>
+    
+    <script src="u-helper.js"></script>
+    <script src="u-smooth.js"></script>
+    
+    <style>
+    
+    #examples > div {
+      display: inline-block;
+      margin-left: 8px;
+      margin-bottom: 8px;
+      width: 320px;
+      height: 240px;
+    }
+    
+    #examples > div > .view {
+      height: 220px;
+      width: 300px;
+      border: 1px solid rgba(0,0,0,0.1);
+      background: rgba(0,0,0,0.1);
+      position: relative;
+      overflow:hidden;
+    }
+
+    #examples > div > .view > div {
+      position:absolute;
+      height: 4px;
+      width: 4px;
+      background: red;
+    }
+
+    </style>
+    
+    <div id="examples"></div>
+  
+    <script>
+    
+      function render_curve(title, func) {
+        if(!func) {
+          console.error('function not defined');
+          return;
+        }
+        var r = ['<div><div class="title">' + title + '</div><div class="view">'];
+    
+        var w = 300;
+        var h = 150;
+        
+        r.push('<div style="left:0px;top:'+(30+h)+'px;width:'+w+'px;background-color:rgba(0,0,0,0.1);"></div>');
+        r.push('<div style="left:0px;top:30px;width:'+w+'px;background-color:rgba(0,0,0,0.1);"></div>');
+
+        for(var v = 0; v <= 1.0; v += 0.01) {
+          var vy = func(v) * h;
+          r.push('<div style="left:'+(v*w)+'px;top:'+(30 + h - vy)+'px;"></div>');
+        }
+
+        r.push('</div></div>');
+        document.getElementById('examples').innerHTML += r.join(' ');
+      }     
+      
+      render_curve('Linear', Smooth.linear);    
+      render_curve('Start', Smooth.start);
+      render_curve('Start^3', Smooth.start3);
+      render_curve('Start^4', Smooth.start4);
+      render_curve('Stop', Smooth.stop);
+      render_curve('Stop^3', Smooth.stop3);
+      render_curve('Stop^4', Smooth.stop4);
+      render_curve('StartStop', Smooth.start_stop);
+      render_curve('StartStop^3', Smooth.start_stop3);
+      render_curve('StartStop^4', Smooth.start_stop4);
+      render_curve('Sin Start', Smooth.sin_start);
+      render_curve('Sin Stop', Smooth.sin_stop);
+      render_curve('Sin StartStop', Smooth.sin_start_stop);
+      render_curve('Sin Peak', Smooth.sin_peak);
+      render_curve('Sin Wave Peak', Smooth.sin_wave_peak);
+      render_curve('Sin', Smooth.sin);
+      render_curve('Arch Peak', Smooth.arch_peak);
+      render_curve('Bounce Start', Smooth.bounce_start);
+      render_curve('Bounce Stop', Smooth.bounce_stop);
+      render_curve('Bounce', Smooth.bounce);
+      render_curve('Undershoot Start', Smooth.undershoot_start);
+      render_curve('Overshoot Stop', Smooth.overshoot_stop);
+      render_curve('UnderOverShoot', Smooth.under_overshoot);
+
+      render_curve('Composition: Crossfade (Sin/Stop)', Smooth.compose.crossfade(Smooth.sin, Smooth.stop));
+      render_curve('Composition: Crossfade (Arch/Overshoot)', Smooth.compose.crossfade(Smooth.arch_peak, Smooth.overshoot_stop));
+      render_curve('Composition: Chain (Sin/Stop)', Smooth.compose.chain(Smooth.sin, Smooth.stop));
+      render_curve('Composition: Mix (Sin/Stop)', Smooth.compose.mix(Smooth.sin, Smooth.stop));
+
+    </script>
+  
+  </body>
+
+</html>

@@ -78,6 +78,14 @@ function clamp(v, min, max) {
 	return(v);
 }
 
+function clamp01(v) {
+	if(0 !== false && v < 0)
+		return(0);
+  if(1 !== false && v > 1)
+		return(1);
+	return(v);
+}
+
 function each(o, f) {
   if(!o)
     return;
