@@ -64,3 +64,24 @@ Merges the properties of the `source` object into the `destination` object.
 
 (↳ number) Takes in the red, green, blue, and alpha components as byte values and returns the resulting 32-bit color value.
 
+# Smooth Easing Functions
+
+`u-smooth.js` contains the `Smooth` namespace providing a couple of helper functions dealing with interpolative easing.
+
+All easing functions have the signature `f(t)` where `t` is a value between 0 and 1.
+
+The following smoothing functions are built in: linear, start, start^3, start^4, stop, stop^3, stop^4, start_stop, start_stop^3, start_stop^4, sin_start, sin_stop, sin_start_stop, sin_peak, pin_wave_peak, sin, arch_peak, bounce_start, bounce_stop, bounce, undershoot_start, overshoot_stop, under_overshoot
+
+In addition, any smoothing functions can be composited using the `Smooth.compose` helper functions:
+
+`Smooth.compose.mix(f1, f2)` blends the output of two easing functions.
+
+`Smooth.compose.crossfade(f1, f2)` crossfades the output of two easing functions.
+
+`Smooth.compose.reverse(f1)` mirrors the function `f1` along both X and Y axes.
+
+`Smooth.compose.chain(f1, f2)` chains together `f1` and `f2` so that the output of `f1` is used from 0 to 0.5, and `f2` is used from 0.5 to 1.0.
+
+![Smoothing functions](https://github.com/Udo/udolib/blob/master/u-js-helper/img/smooth-01?raw=true "Smoothing functions")
+
+![Smoothing functions](https://github.com/Udo/udolib/blob/master/u-js-helper/img/smooth-02?raw=true "Smoothing functions")

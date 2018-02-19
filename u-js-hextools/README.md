@@ -107,7 +107,7 @@ Note: To avoid spamming the garbage collector with bound versions of `f`, `grid.
 
 Calls the function `f` on all cells in the area of the list `cells` (an array of cells), within a distance of `radius`. The expected signature of `f` is `function(cell, distanceToCenter)`.
 
-![eachInAreaOf example](https://github.com/Udo/udolib/blob/master/u-js-hextools/hextools-example-eachinareaof.png?raw=true "Udolib eachInAreaOf() example")
+![eachInAreaOf example](https://github.com/Udo/udolib/blob/master/u-js-hextools/img/hextools-example-eachinareaof.png?raw=true "Udolib eachInAreaOf() example")
 
 #### Example: Highlighting All Surrounding Hexes in PIXI.JS
 
@@ -125,7 +125,7 @@ Calls the function `f` on all cells in the area of the list `cells` (an array of
 
 Calls the function `f` on all cells along a straight path from `cell` c1 to c2. The expected signature of `f` is `function(cell, stepCount)`.
 
-![eachInLine example](https://github.com/Udo/udolib/blob/master/u-js-hextools/hextools-example-eachinline.png?raw=true "Udolib eachInLine() example")
+![eachInLine example](https://github.com/Udo/udolib/blob/master/u-js-hextools/img/hextools-example-eachinline.png?raw=true "Udolib eachInLine() example")
 
 #### Example: Drawing a Line on the Hex Map in PIXI.JS
 
@@ -226,7 +226,7 @@ Calls the function `f` on all neighbors of the `cell`.
 
 Dependencies: Udolib PriorityQueue, PathAStar
 
-![PathAStar example](https://github.com/Udo/udolib/blob/master/u-js-hextools/hextools-example-pathastar.png?raw=true "Udolib PathAStar example")
+![PathAStar example](https://github.com/Udo/udolib/blob/master/u-js-hextools/img/hextools-example-pathastar.png?raw=true "Udolib PathAStar example")
 
 ## Setting Things Up
 
@@ -304,7 +304,7 @@ While the example above does produce meaningful results, it does use PathAStar.f
 
 ```
 
-![PathAStar example](https://github.com/Udo/udolib/blob/master/u-js-hextools/hextools-example-pathastar-distheuristic.png?raw=true "Udolib PathAStar example")
+![PathAStar example](https://github.com/Udo/udolib/blob/master/u-js-hextools/img/hextools-example-pathastar-distheuristic.png?raw=true "Udolib PathAStar example")
 
 ## Using a Custom Movement Costing Function
 
@@ -339,7 +339,7 @@ Based on this `terrainDifficulty` level, we can then provide a custom movement c
 
 Note: the values returned by the movement cost function should never be lower than the guesses returned by the distance heuristic function. 
 
-![PathAStar example](https://github.com/Udo/udolib/blob/master/u-js-hextools/hextools-example-pathastar-costing.png?raw=true "Udolib PathAStar example")
+![PathAStar example](https://github.com/Udo/udolib/blob/master/u-js-hextools/img/hextools-example-pathastar-costing.png?raw=true "Udolib PathAStar example")
 
 
 ## Serializing / Deserializing
