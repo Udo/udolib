@@ -82,6 +82,6 @@ In addition, any smoothing functions can be composited using the `Smooth.compose
 
 `Smooth.compose.chain(f1, f2)` chains together `f1` and `f2` so that the output of `f1` is used from 0 to 0.5, and `f2` is used from 0.5 to 1.0.
 
-![Smoothing functions](https://github.com/Udo/udolib/blob/master/u-js-helper/img/smooth-01?raw=true "Smoothing functions")
+![Smoothing functions](https://github.com/Udo/udolib/blob/master/u-js-helper/img/smooth-01.png?raw=true "Smoothing functions")
 
-![Smoothing functions](https://github.com/Udo/udolib/blob/master/u-js-helper/img/smooth-02?raw=true "Smoothing functions")
+![Smoothing functions](https://github.com/Udo/udolib/blob/master/u-js-helper/img/smooth-02.png?raw=true "Smoothing functions")
