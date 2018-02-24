@@ -1,16 +1,16 @@
 # Udolib PIXI.JS Tools 
 
-# Stage
+# PixiStage
 
-Stage is a helper for setting up a PIXI renderer, stage with layers, event handlers, and very basic animation system.
+PixiStage is a helper for setting up a PIXI renderer, stage with layers, event handlers, and very basic animation system.
 
-## Setup with Stage.create(options)
+## Setup with PixiStage.create(options)
 
-`Stage.create(opt)` returns a stage object. Behind the scenes, this creates a PIXI renderer and sets up some basic things like the event handling system.
+`PixiStage.create(opt)` returns a stage object. Behind the scenes, this creates a PIXI renderer and sets up some basic things like the event handling system.
 
 ````javascript
 
-  var s = Stage.create({
+  var s = PixiStage.create({
       smoothScroll : 0.85,
     });
   
