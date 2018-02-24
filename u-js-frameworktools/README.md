@@ -1,4 +1,6 @@
-# Udolib PIXI.JS Tools 
+# Udolib Graphics Frameworks Tools 
+
+There is PixiStage for PIXI and ThreeStage for Three.js
 
 # PixiStage
 
@@ -218,7 +220,11 @@ Animation slots are a way of queuing up animations sequencially. Do use that fea
 
 This works like the `.animate(f)` function, but the function will only be executed once, during the next frame.
 
+# ThreeStage
 
+(Documentation incomplete)
+
+ThreeStage is a straight port of PixiStage and should behave in the same way.
 
 
 
