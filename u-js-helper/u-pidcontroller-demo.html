@@ -1,0 +1,201 @@
+<html>
+
+  <body>
+  
+    <h1>PID Controller</h1>
+    
+    <script src="u-helper.js"></script>
+    <script src="u-pidcontroller.js"></script>
+    
+    <style>
+    
+    #examples > div {
+      display: inline-block;
+      margin-left: 8px;
+      margin-bottom: 8px;
+      width: 320px;
+      height: 310px;
+    }
+    
+    #examples > div > .view {
+      height: 270px;
+      width: 300px;
+      border: 1px solid rgba(0,0,0,0.1);
+      background: rgba(0,0,0,0.1);
+      position: relative;
+      overflow:hidden;
+    }
+
+    #examples > div > .view > div {
+      position:absolute;
+      height: 4px;
+      width: 4px;
+      background: red;
+    }
+
+    </style>
+    
+    <div id="examples"></div>
+  
+    <script>
+    
+      function render_curve(title, pidc, model_func) {
+        if(!pidc) {
+          console.error('function not defined');
+          return;
+        }
+        var r = ['<div><div class="title">' + title + '</div><div class="view">'];
+    
+        var w = 300;
+        var h = 200;
+        
+        r.push('<div style="left:0px;top:'+(100+h)+'px;width:'+w+'px;background-color:rgba(0,0,0,0.1);"></div>');
+        r.push('<div style="left:0px;top:100px;width:'+w+'px;background-color:rgba(0,0,150,0.5);"></div>');
+
+        var pv = 0;
+
+        for(var v = 0; v <= 1.0; v += 0.005) {
+          var controller_output = pidc.update(pv, 1.0);
+          pv = model_func(controller_output);
+          var vy = pv * h;
+          r.push('<div style="left:'+(v*w)+'px;top:'+(100 + h - vy)+'px;"></div>');
+        }
+
+        r.push('</div></div>');
+        document.getElementById('examples').innerHTML += r.join(' ');
+      }     
+      
+      document.getElementById('examples').innerHTML += '<h2>History Sizes</h2>';
+      
+      render_curve('P=0.1 I=0.1 D=0.1 hist=25 mdl=immediate', PIDController.create({
+        p : 0.1,
+        i : 0.1,
+        d : 0.1,
+        history : 25,
+      }), PIDModel.immediate());    
+
+      render_curve('P=0.1 I=0.1 D=0.1 hist=50 mdl=immediate', PIDController.create({
+        p : 0.1,
+        i : 0.1,
+        d : 0.1,
+        history : 50,
+      }), PIDModel.immediate());    
+
+      render_curve('P=0.1 I=0.1 D=0.1 hist=100 mdl=immediate', PIDController.create({
+        p : 0.1,
+        i : 0.1,
+        d : 0.1,
+        history : 100,
+      }), PIDModel.immediate());    
+
+      document.getElementById('examples').innerHTML += '<h2>Models</h2>';
+      
+      render_curve('P=0.5 I=0.1 D=0.1 hist=inf mdl=additive', PIDController.create({
+        p : 0.5,
+        i : 0.1,
+        d : 0.1,
+      }), PIDModel.additive());    
+
+      render_curve('P=0.5 I=0.1 D=0.1 hist=inf mdl=decaying', PIDController.create({
+        p : 0.5,
+        i : 0.1,
+        d : 0.1,
+      }), PIDModel.decaying());    
+
+      render_curve('P=0.5 I=0.1 D=0.1 hist=inf mdl=slow', PIDController.create({
+        p : 0.5,
+        i : 0.1,
+        d : 0.1,
+      }), PIDModel.slow());    
+
+      render_curve('P=0.5 I=0.1 D=0.1 hist=inf mdl=fast', PIDController.create({
+        p : 0.5,
+        i : 0.1,
+        d : 0.1,
+      }), PIDModel.fast());    
+
+      document.getElementById('examples').innerHTML += '<h2>Proportional Term</h2>';
+      
+      render_curve('P=0.025 I=0.0 D=0.0 hist=inf mdl=slow', PIDController.create({
+        p : 0.025,
+        i : 0.0,
+        d : 0.0,
+      }), PIDModel.slow());    
+
+      render_curve('P=0.1 I=0.0 D=0.0 hist=inf mdl=slow', PIDController.create({
+        p : 0.1,
+        i : 0.0,
+        d : 0.0,
+      }), PIDModel.slow());    
+
+      render_curve('P=0.5 I=0.0 D=0.0 hist=inf mdl=slow', PIDController.create({
+        p : 0.5,
+        i : 0.0,
+        d : 0.0,
+      }), PIDModel.slow());    
+
+      render_curve('P=1.0 I=0.0 D=0.0 hist=inf mdl=slow', PIDController.create({
+        p : 1.0,
+        i : 0.0,
+        d : 0.0,
+      }), PIDModel.slow());    
+
+      document.getElementById('examples').innerHTML += '<h2>Integral Term</h2>';
+      
+      render_curve('P=0.05 I=0.0 D=0.0 hist=inf mdl=slow', PIDController.create({
+        p : 0.05,
+        i : 0.0,
+        d : 0.0,
+      }), PIDModel.slow());    
+
+      render_curve('P=0.05 I=0.0001 D=0.0 hist=inf mdl=slow', PIDController.create({
+        p : 0.05,
+        i : 0.0001,
+        d : 0.0,
+      }), PIDModel.slow());    
+
+      render_curve('P=0.05 I=0.001 D=0.0 hist=inf mdl=slow', PIDController.create({
+        p : 0.05,
+        i : 0.001,
+        d : 0.0,
+      }), PIDModel.slow());    
+
+      render_curve('P=0.05 I=0.01 D=0.0 hist=inf mdl=slow', PIDController.create({
+        p : 0.05,
+        i : 0.01,
+        d : 0.0,
+      }), PIDModel.slow());    
+
+      document.getElementById('examples').innerHTML += '<h2>Differential Term</h2>';
+      
+      render_curve('P=0.05 I=0.001 D=0.0 hist=inf mdl=slow', PIDController.create({
+        p : 0.05,
+        i : 0.001,
+        d : 0.0,
+      }), PIDModel.slow());    
+
+      render_curve('P=0.05 I=0.001 D=0.1 hist=inf mdl=slow', PIDController.create({
+        p : 0.05,
+        i : 0.001,
+        d : 0.1,
+      }), PIDModel.slow());    
+
+      render_curve('P=0.05 I=0.001 D=1.0 hist=inf mdl=slow', PIDController.create({
+        p : 0.05,
+        i : 0.001,
+        d : 1.0,
+      }), PIDModel.slow());    
+
+      render_curve('P=0.05 I=0.001 D=2.0 hist=inf mdl=slow', PIDController.create({
+        p : 0.05,
+        i : 0.001,
+        d : 2.0,
+      }), PIDModel.slow());    
+
+
+
+    </script>
+  
+  </body>
+
+</html>
