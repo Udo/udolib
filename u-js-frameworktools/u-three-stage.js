@@ -119,8 +119,8 @@ var ThreeStage = {
       },
     
       initRenderer : function() {
-        this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        this.camera.position.z = 30;
         this.renderer = new THREE.WebGLRenderer();
         this.renderer.setSize( window.innerWidth, window.innerHeight );
         this.renderer.view = this.renderer.domElement;
@@ -128,37 +128,20 @@ var ThreeStage = {
           this.parentElement.append(this.renderer.view);
         else
           document.body.appendChild(this.renderer.view);
-        this.root = this.scene;
         $('canvas').on('contextmenu', this.hooks.sink); // disable right click
       	$(window).on('resize', this.hooks.resize);
         $(this.renderer.view).on('mousedown', this.hooks.mousedown);
         $(this.renderer.view).on('mouseup', this.hooks.mouseup);
         $(this.renderer.view).on('mouseout', this.hooks.mouseout);
         $(this.renderer.view).on('mouseenter', this.hooks.mouseenter);
+        this.root = new THREE.Scene();
         this.root.mousemove = this.hooks.mousemove;    
+        this.root.click = this.hooks.click;
         this.renderer.view.addEventListener("mousewheel", this.hooks.wheel, false);
         this.renderer.view.addEventListener("DOMMouseScroll", this.hooks.wheel, false);    
-        this.root.click = this.hooks.click;
-        this.hooks.resize();
         this.debug.animationTimestamp = new Date().getTime();
         this.debug.renderTimestamp = new Date().getTime();
-      },
-      
-      cullInvisible : function(e) {
-        return;
-        if(!e.getBounds)
-          return;
-        var bounds = e.getBounds();
-        e.renderable = 
-          bounds.x >= 0 && 
-          bounds.y >= 0 && 
-          bounds.x+bounds.width <= this.size.x && 
-          bounds.y+bounds.height <= this.size.y;
-        if(false && e.renderable) {
-          for(var i = 0; i < e.children.length; i++) {
-            this.cullInvisible(e.children[i]);
-          }
-        }
+        this.hooks.resize();
       },
     
       renderFrame : function() {
@@ -167,20 +150,6 @@ var ThreeStage = {
         }
       	else if(!this.options.stopAnimation) {
       		const st = new Date().getTime();
-          /*
-      		if(this.root.scale.x != this.mouse.zoom) {
-        	  if(this.options.smoothZoom) {
-              this.root.scale.x = (this.options.smoothZoom*this.root.scale.x) + (1-this.options.smoothZoom)*this.mouse.zoom;
-              this.root.scale.y = (this.options.smoothZoom*this.root.scale.y) + (1-this.options.smoothZoom)*this.mouse.zoom;
-        	  }	else {
-              this.root.scale.x = this.mouse.zoom;
-              this.root.scale.y = this.mouse.zoom;
-        	  }
-      		}		
-          if(this.options.viewCulling) {
-            this.cullInvisible(this.root);
-          } 
-          * */
       		this.animation.doAll((st - this.debug.animationTimestamp) / 1000);
           this.renderer.render(this.root, this.camera);      
       		const ct = new Date().getTime();
@@ -364,9 +333,6 @@ var ThreeStage = {
       
     	resize : function(){    
     	  this.size = this.getViewportSize();
-    	  //this.renderer.resize(this.size.x, this.size.y);  		
-        this.root.position.x = this.size.x/2;
-        this.root.position.y = this.size.y/2;
         this.trigger('resize', this.size);
       },
       
@@ -454,22 +420,9 @@ var ThreeStage = {
     s.size = s.getViewportSize();
     s.initRenderer();
     
-    /*if(s.options.smoothScroll) {
-      s.makeDraggable(s.root, 'pivotTarget');
-      s.root.pivotTarget = { x : 0, y : 0 };
-      s.animate(function(dt) {
-        s.root.pivot.x = (s.options.smoothScroll)*s.root.pivot.x + (1-s.options.smoothScroll)*s.root.pivotTarget.x;
-        s.root.pivot.y = (s.options.smoothScroll)*s.root.pivot.y + (1-s.options.smoothScroll)*s.root.pivotTarget.y;
-        return(true);
-      });
-    } else {
-      s.makeDraggable(s.root, 'pivot');
-    }*/
-    
     return(s);
   	
   },
   	
 }
-
 
