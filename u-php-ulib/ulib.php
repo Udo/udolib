@@ -14,9 +14,9 @@ function first()
 }
 
 # append any string to the given file
-function writeToFile($filename, $content)
+function write_to_file($filename, $content)
 {
-  if (is_array($content)) $content = getArrayDump($content);
+  if (is_array($content)) $content = json_encode($content);
   $open = fopen($filename, 'a+');
   fwrite($open, $content);
   fclose($open);
@@ -57,10 +57,92 @@ function reduce($list, $func)
   return($result);
 }
 
+function cfg($key)
+{
+  $config = $GLOBALS['config'];
+  $seg = explode('/', $key);
+  $lastSeg = array_pop($seg);
+  foreach($seg as $s)
+  {
+    if(is_array($config[$s]))
+      $config = $config[$s];
+    else
+      $config = array();  
+  }
+	return($config[$lastSeg]);
+}
+
+
 # **************************** STRING/FORMATTING FUNCTIONS ******************************
 
-# 
-function ageToString($unixDate, $new = 'just now', $ago = 'ago')
+function strings_to_array($stringArray, $params = array())
+{
+  $result = array();  
+  if (is_array($stringArray))
+    foreach ($stringArray as $line)
+    {
+      $key = CutSegment('=', $line);
+      $line = trim($line);
+      if(substr($key, -1) == '+')
+      {
+        // add this to array by key
+        $key = substr($key, 0, -1);
+        $result[$key][] = $line;
+      }
+      else if(substr($line, 0, 1) == '[' && substr($line, -1) == ']')
+      {
+        foreach(explode(',', substr($line, 1, -1)) as $seg)
+          $result[$key][] = $seg;
+      }
+      else if ($key != '') $result[$key] = $line;
+    }
+  return($result);
+}
+
+function text_to_array($text, $params = array())
+{
+  $list = explode("\n", $text);
+  return(strings_to_array($list, $params));
+}
+
+function stringlistToText($stringlist)
+{
+  $list = array_to_strings($stringlist);
+  return(implode("\n", $list));
+}
+
+function base_convert_any($numberInput, $fromBaseInput, $toBaseInput)
+{
+  if ($fromBaseInput==$toBaseInput) return $numberInput;
+  $fromBase = str_split($fromBaseInput,1);
+  $toBase = str_split($toBaseInput,1);
+  $number = str_split($numberInput,1);
+  $fromLen=strlen($fromBaseInput);
+  $toLen=strlen($toBaseInput);
+  $numberLen=strlen($numberInput);
+  $retval='';
+  if ($toBaseInput == '0123456789')
+  {
+      $retval=0;
+      for ($i = 1;$i <= $numberLen; $i++)
+          $retval = bcadd($retval, bcmul(array_search($number[$i-1], $fromBase),bcpow($fromLen,$numberLen-$i)));
+      return $retval;
+  }
+  if ($fromBaseInput != '0123456789')
+      $base10=base_convert_any($numberInput, $fromBaseInput, '0123456789');
+  else
+      $base10 = $numberInput;
+  if ($base10<strlen($toBaseInput))
+      return $toBase[$base10];
+  while($base10 != '0')
+  {
+      $retval = $toBase[bcmod($base10,$toLen)].$retval;
+      $base10 = bcdiv($base10,$toLen,0);
+  }
+  return $retval;
+}
+
+function age_to_string($unixDate, $new = 'just now', $ago = 'ago')
 {
   if($unixDate == 0) return('-');
   $result = '';
@@ -108,12 +190,12 @@ function nibble($segdiv, &$cake, &$found = false)
   return $result;
 }
 
-function startsWith($s, $match)
+function starts_with($s, $match)
 {
   return(substr($s, 0, strlen($match)) == $match);
 }
 
-function endsWith($s, $match)
+function ends_width($s, $match)
 {
   return(substr($s, -strlen($match)) == $match);
 }
@@ -136,7 +218,7 @@ function match($subject, $criteria)
   return($result);
 }
 
-function parseRequestURI($uri = false)
+function parse_request_uri($uri = false)
 { 	
   $result = parse_url(@first($uri, $_SERVER['REQUEST_URI']));
 
