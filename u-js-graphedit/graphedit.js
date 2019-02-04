@@ -1,27 +1,199 @@
-var ge_count = 1;
+var id_counter = 1;
 
 function GraphEdit(container, opt) {
 
-  ge_count++;
+  id_counter++;
 
   this.container = container;  
   this.graph = {};
   this.opt = opt;
+  this.id = 'graphedit-'+id_counter;
   
   if(!opt.width) opt.width = (container.style.width+'');
   if(!opt.height) opt.height = (container.style.height+'');
+  if(!opt.highlight_color) opt.highlight_color = 'yellow';
+  if(!opt.box_color) opt.box_color = 'rgba(0,0,0,0.1)';
+  if(!opt.box_border_color) opt.box_border_color = 'rgba(0,0,0,0.2)';
+  if(!opt.box_opts) opt.box_opts = 'rx="12" ry="12"';
+  if(!opt.box_width) opt.box_width = (opt.grid ? opt.grid*8 : 280);
+  if(!opt.box_height) opt.box_height = (opt.grid ? opt.grid*5 : 160);
+  if(!opt.connector_color) opt.connector_color = 'green';
+  if(!opt.connector_border_color) opt.connector_border_color = 'white';
+  opt.default_pos = 0;
   
-  this.container.innerHTML = '<svg id="graphedit-'+ge_count+'" viewBox="0 0 '+
+  this.container.innerHTML = '<svg id="'+this.id+'" viewBox="0 0 '+
     opt.width.substr(0, opt.width.length-2)+' '+
     opt.height.substr(0, opt.height.length-2)+
     '" xmlns="http://www.w3.org/2000/svg"></svg>';
     
-  var stage = this.stage = document.getElementById('graphedit-'+ge_count);
-    
-  this.draw = function() {
-    stage.innerHTML = ('<rect x="120" y="0" width="100" height="100" rx="15" ry="15" />');
+  var stage = this.stage = document.getElementById(this.id);
+  var mouse = this.mouse = {
+    button : false,
+    x : 0,
+    y : 0,
+    drag_x : 0,
+    drag_y : 0,
+    selected_object : false,
   }
+    
+  this.add_rect = function(box_opt) {
+    var box_id = 'e-'+(++id_counter);
+    stage.innerHTML += '<rect id="'+box_id+'" '+
+      'style="fill:'+(box_opt.color || opt.box_color)+';stroke-width:0;stroke:'+
+        (box_opt.border_color || opt.box_border_color)+';" '+
+      'x="'+(box_opt.x)+'" y="'+(box_opt.y)+
+      '" width="'+(box_opt.width || opt.width)+'" height="'+
+        (box_opt.height || opt.box_height)+'" '+(box_opt.opts || '')+' />';
+    return(box_id);
+  }
+  
+  var add_connector = this.add_connector = function(box_id, con_opt) {
+    var box = document.getElementById(box_id);
+    if(!box.innerHTML) box.innerHTML = '';
+    box.innerHTML += '<circle cx="50" cy="50" x="50" y="50" r="10" '+
+      ' pointer-events="visiblePoint" '+
+      ' is-connectable="true"'+
+      ' style="stroke:'+(con_opt.border_color || opt.connector_border_color)+
+      ';stroke-width:1;fill:'+(con_opt.border_color || opt.connector_border_color)+'" />';
+  }
+  
+  var add_box = this.add_box = function(box_opt) {
+    var box_id = 'e-'+(++id_counter);
+    if(typeof box_opt.x == 'undefined') {
+      opt.default_pos += (opt.grid ? opt.grid*4 : 100);
+      box_opt.x = box_opt.y = opt.default_pos;
+      console.log(opt.default_pos, box_id);
+    }
+    stage.innerHTML += ('<g id="'+box_id+'" x="'+(box_opt.x)+'" y="'+(box_opt.y)+'" transform="translate('+(box_opt.x)+','+(box_opt.y)+')">'+
+      '<rect id="b-'+box_id+'" is-draggable="true" drag="'+box_id+'" pointer-events="visiblePoint" '+
+      'style="fill:'+(box_opt.color || opt.box_color)+';stroke-width:1;stroke:'+
+        (box_opt.border_color || opt.box_border_color)+';" '+
+      ' width="'+(box_opt.width || opt.box_width)+'" height="'+
+        (box_opt.height || opt.box_height)+'" '+(box_opt.opts || opt.box_opts)+' /></g>');
+    add_connector(box_id, {});
+    return(box_id);
+  }
+  
+  var make_connection_path = this.make_connection_path = function(x1, y1, x2, y2) {
+    var mx1 = (x2 - x1) * 0.5;
+    return('M'+x1+' '+y1+' '+
+      ' C'+(x1+mx1)+' '+(y1)+' '+
+      ' '+(x1+mx1)+' '+(y2)+' '+
+      ' '+x2+' '+y2+' ');
+  }
+  
+  var add_connection = this.add_connection = function(x1, y1, x2, y2, con_opt) {
+    var box_id = 'e-'+(++id_counter);
+    stage.innerHTML += '<path id="'+box_id+'" d="'+make_connection_path(x1, y1, x2, y2)+'" style="fill:none;stroke:blue;stroke-width:3;"/>';
+    return(box_id);
+  }
+  
+  this.highlight_element = function(e) {
+    var hl = e.getAttribute('hl'); if(!hl) hl = opt.highlight_color;
+    if(!e.getAttribute('og-color')) e.setAttribute('og-color', e.style.stroke);
+    if(!e.getAttribute('og-stroke-width')) e.setAttribute('og-stroke-width', e.style['stroke-width']);
+    e.style.stroke = hl;
+    e.style['stroke-width'] = 4;
+  }
+
+  this.unhighlight_element = function(e) {
+    if(e.getAttribute('og-color')) {
+      e.style.stroke = e.getAttribute('og-color');
+      e.style['stroke-width'] = e.getAttribute('og-stroke-width');
+    }
+  }
+  
+  this.grid_snap = function(c0) {
+    if(!opt.grid) return(c0);
+    return(Math.round(c0 / opt.grid) * opt.grid);
+  }
+  
+  var get_element_pos = this.get_element_pos = function(e) {
+    var parent = e.parentNode;
+    var result = { x : e.getAttribute('x')*1.0, y : e.getAttribute('y')*1.0 };
+    if(parent && parent.tagName == 'g') {
+      result.x += parent.getAttribute('x')*1.0;
+      result.y += parent.getAttribute('y')*1.0;
+    }
+    console.log(result);
+    return(result);
+  }
+  
+  stage.innerHTML = '<defs><pattern id="grid" width="'+
+      opt.grid+'" height="'+opt.grid+'" patternUnits="userSpaceOnUse">'+
+      '<path d="M '+opt.grid+' 0 L 0 0 0 '+opt.grid+'" style="stroke:rgb(0,0,0,0.1);fill:none;stroke-width:1;"/>'+
+    '</pattern></defs>';
+        
+  this.add_rect({ color : 'url(#grid)', x : 0, y : 0, width : '100%', height : '100%' });
       
+  stage.addEventListener('mousemove', (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+    if(mouse.button && mouse.is_dragging) {
+      var tx, ty;
+      mouse.drag.setAttribute('x', tx = this.grid_snap(mouse.x + mouse.dt_x)); 
+      mouse.drag.setAttribute('y', ty = this.grid_snap(mouse.y + mouse.dt_y)); 
+      if(mouse.drag.tagName == 'g') { 
+        // since gs don't support x and y, BUT there is no reliable way to calculate their position
+        // taking tranform() into account, we're keeping x and y attributes around as the data basis
+        // and then we'll set the transform to force the g into position
+        mouse.drag.setAttribute('transform', 'translate('+tx+','+ty+')');
+      }
+    }    
+    else if(mouse.button && mouse.is_connecting) {
+      mouse.path_element.setAttribute('d', make_connection_path(mouse.drag_x, mouse.drag_y, mouse.x, mouse.y));
+    }    
+  });
+
+  stage.addEventListener('mousedown', (e) => {
+    if(e.button == 0) mouse.button = true;
+    mouse.drag_x = mouse.x;
+    mouse.drag_y = mouse.y;
+    mouse.selected_object = e.target;
+    if(mouse.selected_object) {
+      mouse.drag = mouse.selected_object;
+      var drag_group = mouse.selected_object.getAttribute('drag');
+      if(drag_group) mouse.drag = document.getElementById(drag_group);
+      mouse.is_dragging = mouse.selected_object.getAttribute('is-draggable');
+      if(mouse.is_dragging) {
+        mouse.dt_x = mouse.drag.getAttribute('x') - mouse.x;
+        mouse.dt_y = mouse.drag.getAttribute('y') - mouse.y;
+        this.highlight_element(mouse.selected_object);
+      }
+      mouse.is_connecting = mouse.selected_object.getAttribute('is-connectable');
+      if(mouse.is_connecting) {
+        console.log('connect start');
+        var dpos = get_element_pos(mouse.selected_object);
+        mouse.drag_x = dpos.x;
+        mouse.drag_y = dpos.y;
+        mouse.path_element_id = add_connection(dpos.x, dpos.y, mouse.x, mouse.y, {});
+        mouse.path_element = document.getElementById(mouse.path_element_id);
+      }
+    } else {
+      mouse.is_dragging = false;
+      mouse.is_connecting = false;
+    }
+    // console.log(e.target.tagName, mouse);
+  });
+      
+  stage.addEventListener('mouseup', (e) => {
+    if(e.button == 0) mouse.button = false;
+    console.log(e.target.tagName, e.target.id, mouse);
+    if(mouse.is_dragging) {
+      mouse.is_dragging = false;
+      this.unhighlight_element(mouse.selected_object);
+    }
+    if(mouse.is_connecting) {
+      mouse.is_connecting = false;
+      console.log('connect end');
+      if(e.target && e.target.getAttribute('is-connectable')) {
+        var dpos = get_element_pos(e.target);
+        mouse.path_element.setAttribute('d', 
+          make_connection_path(mouse.drag_x, mouse.drag_y, dpos.x, dpos.y));
+      }   
+    }
+  });
+
   console.log('init complete');
     
 }
