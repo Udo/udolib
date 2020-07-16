@@ -27,6 +27,10 @@ function lerp(a, b, t) {
   return( a + t*(b-a) );
 }
 
+function linear_map(a, t_min, t_max) {
+	return((a / (t_max - t_min)) + t_min);
+}
+
 function bresenham_line(x0, y0, x1, y1, f) {
   var result = [];
  
