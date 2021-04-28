@@ -32,7 +32,7 @@ function GraphEdit(container, options) {
         drag_y: 0,
         selected_object: false,
     }
-    
+
     var render_connectors = (opt) => {
 	    var r = '';
 	    opt.connectors.forEach((con, idx) => {
@@ -44,26 +44,26 @@ function GraphEdit(container, options) {
 	    });
 	    return(r);
     }
-    
+
     var render_box = (opt) => {
-	    return('<g id="' + opt.id + '" x="' + (opt.x) + 
+	    return('<g id="' + opt.id + '" x="' + (opt.x) +
         	'" y="' + (opt.y) + '" transform="translate(' + (opt.x) + ',' + (opt.y) + ')">' +
-            '<rect id="b-' + opt.id + '" is-draggable="true" drag="' + opt.id + 
+            '<rect id="b-' + opt.id + '" is-draggable="true" drag="' + opt.id +
             '" pointer-events="visiblePoint" ' +
             'style="fill:' + (opt.color || options.box_color) + ';stroke-width:1;stroke:' +
             (opt.border_color || options.box_border_color) + ';" ' +
             ' width="' + (opt.width || options.box_width) + '" height="' +
             (opt.height || options.box_height) + '" />'+render_connectors(opt)+'</g>');
     }
-    
+
     var render_boxes = () => {
 		var r = '';
 		for (var key in this.data.boxes) if (this.data.boxes.hasOwnProperty(key)) {
-			r += render_box(this.data.boxes[key]);	
+			r += render_box(this.data.boxes[key]);
 		}
 		return(r);
     }
-    
+
 	var render_rect = function(opt) {
         var box_id = 'e-' + (++id_counter);
         return('<rect id="' + box_id + '" ' +
@@ -73,7 +73,7 @@ function GraphEdit(container, options) {
             '" width="' + (opt.width || options.width) + '" height="' +
             (opt.height || options.box_height) + '" />');
     }
-    
+
     var render_grid = () => {
 	    return('<defs><pattern id="grid" width="' +
             options.grid + '" height="' + options.grid + '" patternUnits="userSpaceOnUse">' +
@@ -87,7 +87,7 @@ function GraphEdit(container, options) {
 	            height: '100%'
 	    }));
     }
-    
+
     this.on = {
 
         mousemove : (e) => {
@@ -104,7 +104,7 @@ function GraphEdit(container, options) {
                     mouse.drag.setAttribute('transform', 'translate(' + tx + ',' + ty + ')');
                 }
             } else if (mouse.button && mouse.is_connecting) {
-                mouse.path_element.setAttribute('d', 
+                mouse.path_element.setAttribute('d',
                 	make_connection_path(mouse.drag_x, mouse.drag_y, mouse.x, mouse.y));
             }
         },
@@ -139,7 +139,7 @@ function GraphEdit(container, options) {
                 mouse.is_connecting = false;
             }
             // console.log(e.target.tagName, mouse);
-        }, 
+        },
 
         mouseup : (e) => {
             if (e.button == 0) mouse.button = false;
@@ -175,8 +175,8 @@ function GraphEdit(container, options) {
 
 	    stage.addEventListener('mousemove', this.on.mousemove);
 	    stage.addEventListener('mousedown', this.on.mousedown);
-	    stage.addEventListener('mouseup', this.on.mouseup);	
-	} 
+	    stage.addEventListener('mouseup', this.on.mouseup);
+	}
 
     var add_box = this.add_box = (opt) => {
         opt.id ='e-' + (++id_counter);
@@ -204,12 +204,12 @@ function GraphEdit(container, options) {
         opt.type = 'connection';
         opt.id = eid;
 		elements.push(opt);
-        stage.innerHTML += '<path id="' + eid + '" d="' + 
-        	make_connection_path(opt.x1, opt.y1, opt.x2, opt.y2) + 
+        stage.innerHTML += '<path id="' + eid + '" d="' +
+        	make_connection_path(opt.x1, opt.y1, opt.x2, opt.y2) +
         	'" style="fill:none;stroke:blue;stroke-width:3;"/>';
         return (eid);
     }
-    
+
     var remove_connection = this.remove_connection = (eid) => {
 		var element = document.getElementById(eid);
 		element.parentNode.removeChild(element);
@@ -217,7 +217,7 @@ function GraphEdit(container, options) {
 
     var highlight_element = this.highlight_element = (e) => {
         var hl = e.getAttribute('hl');
-        if (!hl) hl = opt.highlight_color;
+        if (!hl) hl = options.highlight_color;
         if (!e.getAttribute('og-color')) e.setAttribute('og-color', e.style.stroke);
         if (!e.getAttribute('og-stroke-width')) e.setAttribute('og-stroke-width', e.style['stroke-width']);
         e.style.stroke = hl;
@@ -232,8 +232,8 @@ function GraphEdit(container, options) {
     }
 
     var grid_snap = this.grid_snap = (c0) => {
-        if (!opt.grid) return (c0);
-        return (Math.round(c0 / opt.grid) * opt.grid);
+        if (!options.grid) return (c0);
+        return (Math.round(c0 / options.grid) * options.grid);
     }
 
     var get_element_pos = this.get_element_pos = (e) => {
