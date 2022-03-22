@@ -1,0 +1,213 @@
+<html>
+
+<body>
+
+	<style>
+	* {
+		box-sizing: border-box;
+		line-height: inherit;
+	}
+	body {
+		font-family: sans serif;
+		line-height: 160%;
+		margin: 0;
+	}
+	.three-cols {
+		display:flex;
+	}
+	.three-cols > * {
+		flex: 1;
+	}
+
+	.fld {
+		height: calc(85vh - 100px);
+		border: 4px solid rgba(0,0,0,0.2);
+		overflow: auto;
+	}
+
+	textarea {
+		width: 100%;
+		padding: 8px;
+	}
+
+	#input {
+		background: #26c;
+		color: yellow;
+	}
+
+	#datavar {
+		background: #48a;
+		color: yellow;
+	}
+
+	pre, #gensource {
+		margin: 0;
+		background: rgba(0,0,0,0.1);
+		white-space: pre-wrap;
+	}
+
+	h1 {
+		background: darkorange;
+		color: black;
+		margin: 0;
+		padding: 16px;
+	}
+
+	h2 {
+		background: gray;
+		color: white;
+		margin: 0;
+		padding: 16px;
+	}
+
+	button {
+		padding: 8px;
+		min-width: 160px;
+		background: green;
+		color: white;
+		font-weight: bold;
+		cursor: pointer;
+	}
+
+	button:hover {
+		background: darkgreen;
+	}
+
+	#result > div div {
+		padding: 8px;
+	}
+
+	a {
+		color: blue;
+		cursor: pointer;
+	}
+
+	</style>
+
+	<h1>U-Random Noise Testing Ground</h1>
+
+	<script src="u-random.js"></script>
+
+	<script>
+
+
+	</script>
+
+	<div style="background:black;padding:8px;">
+
+	</div>
+
+	<div class="three-cols">
+
+		<div>
+			<h2>Functions</h2>
+			<ul>
+				<li><a onclick="test_noise1d( 0 );">Noise 0-1 (seed 0)</a></li>
+				<li><a onclick="test_noise1d( 10234 );">Noise 0-1 (seed 10234)</a></li>
+				<li><a onclick="test_random_series( (rs) => { return(rs.get()) } );">Random Series 0-1</a></li>
+				<li><a onclick="test_random_series( (rs) => { return(rs.get_float(1,8)) } );">Random Series f 1-8</a></li>
+				<li><a onclick="test_random_series( (rs) => { return(rs.get_int(100,800)) } );">Random Series int 100-800</a></li>
+				<li><a onclick="test_perlin( );">Perlin Noise</a></li>
+
+			</ul>
+		</div>
+
+		<div>
+			<h2>Output</h2>
+			<div class="fld" id="result"></div>
+		</div>
+
+		<div>
+			<h2>Buckets</h2>
+			<pre class="fld" id="text_result"></pre>
+		</div>
+
+	</div>
+
+	<script>
+
+		function test_noise1d(seed) {
+			var buckets = {};
+
+			document.querySelector('#result').innerHTML = 'NOISE 1D:<br/>';
+
+			for(var i = 0; i < 100000; i++) {
+				var n = get_noise_01(i, seed);
+				if(i < 100)
+					document.querySelector('#result').innerHTML += n+'<br/>';
+				var s = (n+'').substr(2, 1);
+				if(!buckets[1*s])
+					buckets[1*s] = 1;
+				else
+					buckets[1*s] += 1;
+			}
+
+			var bucket_report = [];
+			for(var i = 0; i < 10; i++) {
+				bucket_report.push(i+'='+buckets[i]);
+			}
+
+			document.querySelector('#text_result').textContent = bucket_report.join("\n");
+		}
+
+		function test_perlin(seed) {
+			var buckets = {};
+
+			document.querySelector('#result').innerHTML = 'PERLIN NOISE:<br/>';
+
+			var pn = new PerlinNoise();
+
+			for(var i = 0; i < 100000; i++) {
+				var n = pn.get(i/10);
+				if(i < 100)
+					document.querySelector('#result').innerHTML += n+'<br/>';
+				var s = (n+'').substr(2, 1);
+				if(!buckets[1*s])
+					buckets[1*s] = 1;
+				else
+					buckets[1*s] += 1;
+			}
+
+			var bucket_report = [];
+			for(var i = 0; i < 10; i++) {
+				bucket_report.push(i+'='+buckets[i]);
+			}
+
+			document.querySelector('#text_result').textContent = bucket_report.join("\n");
+		}
+
+
+		function test_random_series(f) {
+			var buckets = {};
+
+			document.querySelector('#result').innerHTML = 'RANDOM SERIES '+random_series_seed+':<br/>';
+
+			var rs = new RandomSeries();
+
+			for(var i = 0; i < 100000; i++) {
+				var n = f(rs);
+				if(i < 100)
+					document.querySelector('#result').innerHTML += n+'<br/>';
+				var s = (n+'').substr(2, 1);
+				if(!buckets[1*s])
+					buckets[1*s] = 1;
+				else
+					buckets[1*s] += 1;
+			}
+
+			var bucket_report = [];
+			for(var i = 0; i < 10; i++) {
+				bucket_report.push(i+'='+buckets[i]);
+			}
+
+			document.querySelector('#text_result').textContent = bucket_report.join("\n");
+		}
+
+
+		test_noise1d();
+
+	</script>
+
+</body>
+
+</html>

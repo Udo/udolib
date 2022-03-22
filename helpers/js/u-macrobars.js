@@ -81,7 +81,7 @@ var compile = function(text, options = {}) {
 			gensource.push(token.text);
 		},
 		defer : (token) => {
-			gensource.push('output += "<script>\n" + '+JSON.stringify(token.text)+' + "</script>\n";');
+			gensource.push('output += '+JSON.stringify("\n<script>\n"+token.text+"\n</script>\n")+';');
 		},
 		var_out : (token) => {
 			gensource.push('output += safe_out('+(token.text)+', default_empty_field);');
@@ -159,6 +159,9 @@ var compile = function(text, options = {}) {
 	gensource.push('	} catch (ee) { console.error(ee); output += debug_out(ee); }');
 	gensource.push('	return(output);');
 	gensource.push('}');
+
+	if(options.debug)
+		console.log(gensource);
 
 	var f = {};
 	try {

@@ -208,7 +208,7 @@ function truncate($s, $maxLength, $indicator = '')
 		return(substr($s, 0, $maxLength).$indicator);
 }
 
-function match($subject, $criteria)
+function match_with($subject, $criteria)
 {
 	$result = true;
 	foreach($criteria as $k => $v)

@@ -1,19 +1,661 @@
 <html>
 
-  <script src="graphedit.js?"></script>
+<script src="jquery.js"></script>
+<script src="../../helpers/js/u-helper.js"></script>
+<script src="../../helpers/js/minibars.js"></script>
 
-  <div id="ge-container" style="width:1200px;height:800px;background:rgba(0,0,0,0.1);"></div>
+<style>
 
-  <script>
+.no-selection {
+  -webkit-touch-callout: none;
+    -webkit-user-select: none;
+     -khtml-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
 
-  var g1 = new GraphEdit(document.getElementById('ge-container'), {
-    grid : 32,
-  });
+.graphedit-container {
+	margin:0;
+	position:absolute;
+	left:0;
+	right:0;
+	top:0px;
+	bottom:0px;
+	background: #000;
+	overflow: hidden;
+}
 
-  g1.add_box({});
-  g1.add_box({});
-  g1.add_box({});
+.graphedit-canvas {
+	position:absolute;
+	left:0px;
+	right:0px;
+	background: url(blueprint.svg) #333;
+	cursor: move;
+}
 
-  </script>
+.rs-node {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 160px;
+	min-height: 120px;
+	background: rgba(100,100,100,1.0);
+	border: 2px solid rgba(200,200,200,0.2);
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.rs-node .title {
+	padding: 4px;
+	background: black;
+	pointer-events: none;
+	color: white;
+}
+
+.rs-node .param {
+	border-bottom: 1px solid rgba(255,255,255,0.2);
+	padding: 4px;
+}
+
+.rs-node .param .connector {
+	width: 18px;
+	height: 18px;
+	border-radius: 16px;
+	margin-top: 0px;
+	margin-right: 0px;
+	border: 1px solid rgba(255,255,255,0.4);
+}
+
+.rs-node .param-input .connector {
+	float: left;
+	background: lightgreen;
+}
+
+.rs-node .param-output .connector {
+	float: right;
+	background: #8af;
+}
+
+.rs-node .content {
+	margin-left: 24px;
+	margin-right: 24px;
+}
+
+.rsconnection {
+	position: absolute;
+	pointer-events: none;
+}
+
+#graphedit-tool-menu {
+	position: fixed;
+	left: 0;
+	top: 40px;
+	width: 120px;
+	height: auto;
+	background: #222;
+	padding: 8px;
+	color: rgba(255,255,255,0.67);
+}
+
+#graphedit-tool-menu > button {
+	display: block;
+	width: 100%;
+}
+
+</style>
+<script id="t-rsconnection" type="text/x-minibars-template">
+	<svg id="{{id}}" class="rsconnection" style="left:{{x}}px;top:{{y}}px;" width="{{width}}" height="{{height}}" xmlns="http://www.w3.org/2000/svg">
+		<path
+			style="pointer-events: all;"
+			onclick="{{edit_name}}.connection.remove('{{id}}');"
+			onmouseover="$(this).attr('stroke', 'darkorange');"
+			onmouseout="$(this).attr('stroke', 'lightblue');"
+			d="M{{from_x}} {{from_y}}
+			Q {{to_xh0}} {{from_y}}, {{to_xh1}} {{to_yh}}
+			T {{to_x}} {{to_y}}"
+			fill="none"
+			stroke-width="3"
+			stroke="lightblue"/>
+	</svg>
+</script>
+
+<script id="t-rsnode" type="text/x-minibars-template">
+	<div class="rs-node no-selection" id="{{id}}"
+		style="left:{{x}}px;top:{{y}}px;"
+		onmousedown="{{edit_name}}.node.mousedown(event);" onmouseup="{{edit_name}}.node.mouseup(event);">
+		<div class="title">
+			<div style="float:right;pointer-events: auto;opacity:0.6;">
+				<button onclick="{{edit_name}}.node.remove('{{id}}');">X</button>
+			</div>
+			{{title}}
+		</div>
+		{{#properties params}}
+		<div class="param param-{{c}}" id="{{@data.id}}-p{{@key}}">
+			<div class="connector" for-node="{{@data.id}}" param-name="{{@key}}"
+				id="{{@data.id}}-pc{{@key}}"
+				onmouseover="{{@data.edit_name}}.connector.mouseover(event);"
+				onmousedown="{{@data.edit_name}}.connector.mousedown(event);"
+				onmouseup="{{@data.edit_name}}.connector.mouseup(event);"></div>
+			<div class="content">
+				{{title}}
+			</div>
+		</div>
+		{{/properties}}
+	</div>
+</script>
+
+<script id="t-toolbaritems" type="text/x-minibars-template">
+
+	<button onclick="{{edit_name}}.load();">Load</button>
+	<button onclick="{{edit_name}}.save();">Save</button>
+	<button onclick="{{edit_name}}.clear();">Clear</button>
+	<hr/>
+	<button onclick="{{edit_name}}.undo();">Undo</button>
+	<button onclick="{{edit_name}}.redo();">Redo</button>
+	<hr/>
+	Nodes
+	{{#properties node_types}}
+	<button onclick="{{@data['edit_name']}}.node.add({ x : {{@data['edit_name']}}.mouse.cx+100, y : {{@data['edit_name']}}.mouse.cy+100, type : '{{@key}}' })">{{init.title}}</button>
+	{{/properties}}
+</script>
+
+<script>
+
+function GraphEdit(init_opt) {
+
+	var is_object = (a) => {
+		if(!a) return(false);
+		return(typeof a === 'object' && a.constructor.name !== "Array");
+	}
+
+	var merge = (o1, o2) => {
+		var r = {};
+
+		each(o1, (v, k) => {
+			r[k] = v;
+		});
+		each(o2, (v, k) => {
+			r[k] = v;
+		});
+
+		return(r);
+	}
+
+	var SE = {
+
+		data : {},
+		data_history : [],
+		data_history_forward : [],
+
+		templates : {
+			rsnode : Minibars.compile($('#t-rsnode').html()),
+			rsconnection : Minibars.compile($('#t-rsconnection').html()),
+		},
+
+		defaults : {
+
+		},
+
+		init : () => {
+			var midx = ($(window).width()-SE.canvas.size)/2;
+			var midy = ($(window).height()-SE.canvas.size)/2;
+			SE.canvas.element
+				.css('width', SE.canvas.size+'px')
+				.css('height', SE.canvas.size+'px')
+				.css('left', (midx)+'px')
+				.css('top', (midy)+'px');
+			if(!SE.data) SE.clear(); else SE.render();
+		},
+
+		load : () => {
+			SE.data_history = [];
+			SE.data = JSON.parse(localStorage['graphedit']);
+			if(!SE.data) SE.data = {};
+			SE.push_history('load');
+			SE.render();
+			if(SE.data.canvas_pos_x)
+				SE.canvas.set_position(SE.data.canvas_pos_x, SE.data.canvas_pos_y);
+		},
+
+		save : () => {
+			localStorage['graphedit'] = JSON.stringify(SE.data);
+		},
+
+		clear : () => {
+			SE.data = { nodes : {}, connections : {}, id_counter : 1000 };
+			SE.data_history.push(SE.data);
+			SE.render();
+		},
+
+		push_history : (what) => {
+			SE.data_history_forward = [];
+			SE.data_history.push(JSON.stringify(SE.data));
+		},
+
+		undo : () => {
+			if(SE.data_history.length <= 1)
+				return;
+			SE.data_history_forward.push(SE.data_history.pop());
+			SE.data = JSON.parse(SE.data_history[SE.data_history.length-1]);
+			SE.render();
+		},
+
+		redo : () => {
+			if(SE.data_history_forward.length == 0)
+				return;
+			SE.data = JSON.parse(SE.data_history_forward.pop());
+			SE.data_history.push(JSON.stringify(SE.data));
+			SE.render();
+		},
+
+		render : () => {
+			if(!is_object(SE.data.nodes)) SE.data.nodes = {};
+			if(!is_object(SE.data.connections)) SE.data.connections = {};
+			SE.canvas.element.empty();
+			each(SE.data.nodes, (node) => {
+				SE.node.create_object(node);
+			});
+			each(SE.data.connections, (con) => {
+				SE.connection.create_object(con);
+			});
+		},
+
+		connection : {
+
+			create_object : (opt) => {
+				$('#'+opt.id).remove();
+				SE.canvas.element.append(SE.templates.rsconnection(merge(opt, SE)));
+			},
+
+			add : (opt) => {
+				opt.id = 'N'+SE.data.id_counter++;
+				opt.ends.forEach((endp, idx) => {
+						if(SE.data.nodes[endp.id].params[endp.param].c == 'input')
+							each(SE.data.nodes[endp.id].params[endp.param].con, (cond, con_id) => {
+								SE.connection.remove(con_id);
+							});
+					var other_idx = idx == 0 ? 1 : 0;
+					SE.data.nodes[endp.id].params[endp.param].con[opt.id] = {
+						to_node : opt.ends[other_idx].id,
+						to_param : opt.ends[other_idx].param,
+					};
+				});
+				SE.connection.calculate_position(opt);
+				SE.push_history('add connection');
+				return(opt);
+			},
+
+			remove : (id, no_undo = false) => {
+				var con = SE.data.connections[id];
+				con.ends.forEach((endp, idx) => {
+					delete SE.data.nodes[endp.id].params[endp.param].con[id];
+				});
+				delete SE.data.connections[id];
+				$('#'+con.id).remove();
+				if(!no_undo)
+					SE.push_history('remove connection');
+			},
+
+			calculate_position : (opt) => {
+				opt.ends.forEach((endp) => {
+					var pos_node = $('#'+endp.id).position();
+					var pos_param = $('#'+endp.id+'-pc'+endp.param).position();
+					endp.x = pos_node.left + pos_param.left + $('#'+endp.id+'-pc'+endp.param).width()*0.5;
+					endp.y = pos_node.top + pos_param.top + $('#'+endp.id+'-pc'+endp.param).height()*1.0 - 6;
+				});
+				var cx = Math.min(opt.ends[0].x, opt.ends[1].x);
+				var cy = Math.min(opt.ends[0].y, opt.ends[1].y);
+				opt.width = Math.abs(opt.ends[0].x - opt.ends[1].x);
+				opt.height = Math.abs(opt.ends[0].y - opt.ends[1].y);
+				opt.from_x = opt.ends[0].x - cx;
+				opt.from_y = opt.ends[0].y - cy;
+				opt.to_x = opt.ends[1].x - cx;
+				opt.to_y = opt.ends[1].y - cy;
+				opt.to_xh0 = opt.from_x+(opt.to_x-opt.from_x)*0.40;
+				opt.to_xh1 = opt.from_x+(opt.to_x-opt.from_x)*0.60;
+				opt.to_yh = opt.from_y+(opt.to_y-opt.from_y)*0.5;
+				opt.x = cx;
+				opt.y = cy;
+				SE.data.connections[opt.id] = opt;
+			},
+
+		},
+
+		connector : {
+
+			current : {},
+
+			update_connection_params : (con) => {
+				var _x1 = SE.mouse.ox;
+				var _y1 = SE.mouse.oy;
+				var _x2 = SE.mouse.x;
+				var _y2 = SE.mouse.y;
+				var cx = Math.min(_x1, _x2);
+				var cy = Math.min(_y1, _y2);
+				con.width = Math.abs(_x2 - _x1);
+				con.height = Math.abs(_y2 - _y1);
+				con.from_x = _x1 - cx;
+				con.from_y = _y1 - cy;
+				con.to_x = _x2 - cx;
+				con.to_y = _y2 - cy;
+				con.to_xh0 = con.from_x+(con.to_x-con.from_x)*0.40;
+				con.to_xh1 = con.from_x+(con.to_x-con.from_x)*0.60;
+				con.to_yh = con.from_y+(con.to_y-con.from_y)*0.5;
+				con.x = SE.mouse.opos.left + cx;
+				con.y = SE.mouse.opos.top + cy;
+			},
+
+			mouseover : (e) => {
+				if(SE.mouse.drag_mode == SE.connector.drag) {
+
+				}
+			},
+
+			mousedown : (e) => {
+				SE.mouse.register_down(e);
+				SE.mouse.drag_mode = SE.connector.drag;
+				var connector = $(e.target);
+				var rpos = connector.position();
+				SE.mouse.opos = $('#'+connector.attr('for-node')).position();
+				SE.mouse.opos.left -= SE.mouse.x - rpos.left - connector.width()*0.65;
+				SE.mouse.opos.top -= SE.mouse.y - rpos.top - connector.height()*1.0;
+				SE.connector.current = {
+					start_node : connector.attr('for-node'),
+					start_param : connector.attr('param-name'),
+					end_c : SE.data.nodes[connector.attr('for-node')].params[connector.attr('param-name')].c == 'output' ? 'input' : 'output',
+					id : 'N'+SE.data.id_counter++,
+				}
+				SE.connector.update_connection_params(SE.connector.current);
+				SE.canvas.element.append(SE.templates.rsconnection(merge(SE.connector.current, SE)));
+				SE.mouse.onup = () => {
+					$('#'+SE.connector.current.id).remove();
+				}
+			},
+
+			mouseup : (e) => {
+				SE.mouse.register_up(e);
+				if(SE.mouse.last_drag_mode == SE.connector.drag) {
+					var endpoint = $(e.target);
+					var node_id = endpoint.attr('for-node');
+					var node_param = endpoint.attr('param-name');
+					var node = SE.data.nodes[node_id];
+					if(SE.connector.current.end_c == node.params[node_param].c && SE.connector.current.start_node != node_id) {
+						var con = SE.connection.add({
+							ends : [
+								{ id : SE.connector.current.start_node,	param : SE.connector.current.start_param, },
+								{ id : node_id,	param : node_param, },
+							],
+						});
+						SE.connection.create_object(con);
+					}
+				}
+			},
+
+			drag : (e) => {
+				SE.connector.update_connection_params(SE.connector.current);
+				$('#'+SE.connector.current.id).replaceWith(SE.templates.rsconnection(merge(SE.connector.current, SE)));
+			},
+
+		},
+
+		node : {
+
+			mousedown : (e) => {
+				SE.mouse.register_down(e);
+				SE.mouse.drag_mode = SE.node.drag;
+				SE.mouse.drag_object = $(e.target);
+				SE.mouse.opos = SE.mouse.drag_object.position();
+				SE.mouse.drag_id = SE.mouse.drag_object.attr('id');
+			},
+
+			mouseup : (e) => {
+				SE.mouse.register_up(e);
+				e.stopPropagation();
+				var node = SE.data.nodes[SE.mouse.drag_id];
+				if(node)
+					SE.push_history('move node');
+			},
+
+			remove : (id) => {
+				var node = SE.data.nodes[id];
+				if(node) {
+					each(SE.data.connections, (con, conid) => {
+						each(con.ends, (con_end) => {
+							if(con_end.id == id)
+								SE.connection.remove(conid);
+						});
+					});
+					delete SE.data.nodes[id];
+					SE.push_history('remove node');
+					SE.render();
+				}
+			},
+
+			drag : (e) => {
+				if(!SE.mouse.drag_object || !SE.data.nodes[SE.mouse.drag_object.attr('id')]) {
+					return;
+				}
+				SE.mouse.drag_object
+					.css('left', (SE.mouse.opos.left - SE.mouse.ox + SE.mouse.x)+'px')
+					.css('top', (SE.mouse.opos.top - SE.mouse.oy + SE.mouse.y)+'px');
+				var node = SE.data.nodes[SE.mouse.drag_object.attr('id')];
+				node.x = (SE.mouse.opos.left - SE.mouse.ox + SE.mouse.x);
+				node.y = (SE.mouse.opos.top - SE.mouse.oy + SE.mouse.y);
+				each(node.params, (p, k) => {
+					each(p.con, (condt, con_id) => {
+						var con = SE.data.connections[con_id];
+						SE.connection.calculate_position(con);
+						SE.connection.create_object(con);
+					});
+				});
+			},
+
+			add : (opt = {}) => {
+				var id = 'N'+SE.data.id_counter++;
+				opt.id = id;
+				if(!opt.x) opt.x = 100;
+				if(!opt.y) opt.y = 100;
+				var template = SE.node_types[opt.type].init;
+				if(!template) {
+					console.log('Error', 'node type not defined', opt.type);
+					return;
+				}
+				each(template, (v, k) => {
+					opt[k] = JSON.parse(JSON.stringify(v));
+				});
+				each(opt.params, (p, k) => {
+					if(!p.con) p.con = {};
+				});
+				SE.data.nodes[id] = opt;
+				SE.node.create_object(opt);
+				SE.push_history('add node');
+				return(opt);
+			},
+
+			create_object : (opt) => {
+				if(!is_object(opt.params)) opt.params = {};
+				each(opt.params, (p) => {
+					if(!is_object(p.con))
+						p.con = {};
+				}),
+				SE.canvas.element.append(SE.templates.rsnode(merge(opt, SE)));
+			},
+
+		},
+
+		node_types : {},
+
+		canvas : {
+
+			size : 2000,
+
+			mouseup : (e) => {
+				SE.mouse.register_up(e);
+				SE.mouse.epos = SE.canvas.element.position();
+				if(SE.mouse.last_drag_mode == SE.canvas.drag &&
+					SE.mouse.epos.left == SE.mouse.opos.left && SE.mouse.epos.top == SE.mouse.opos.top) {
+					//SE.node.add({ x : SE.mouse.cx, y : SE.mouse.cy });
+				}
+			},
+
+			mousedown : (e) => {
+				SE.mouse.register_down(e);
+				SE.mouse.opos = SE.canvas.element.position();
+				SE.mouse.drag_mode = SE.canvas.drag;
+			},
+
+			mousemove : (e) => {
+				SE.mouse.register_move(e);
+			},
+
+			set_position : (x, y) => {
+				SE.data.canvas_pos_x = x;
+				SE.data.canvas_pos_y = y;
+				SE.canvas.element
+					.css('left', (x)+'px')
+					.css('top', (y)+'px');
+			},
+
+			drag : (e) => {
+				SE.canvas.set_position(
+					SE.mouse.opos.left - SE.mouse.ox + SE.mouse.x,
+					SE.mouse.opos.top - SE.mouse.oy + SE.mouse.y);
+			},
+
+		},
+
+		mouse : {
+
+			down : false,
+			x : 0, y : 0,
+			ox : 0, oy : 0,
+			drag_move : false,
+			opos : { },
+			button: false,
+
+			register_down : (e) => {
+				SE.mouse.register_move(e);
+				SE.mouse.down = true;
+				SE.mouse.ox = SE.mouse.x;
+				SE.mouse.oy = SE.mouse.y;
+				e.stopPropagation();
+			},
+
+			register_up : (e) => {
+				SE.mouse.register_move(e);
+				SE.mouse.down = false;
+				SE.mouse.drag_object = false;
+				SE.mouse.last_drag_mode = SE.mouse.drag_mode;
+				SE.mouse.drag_mode = false;
+				if(SE.mouse.onup) SE.mouse.onup(e);
+				SE.mouse.onup = false;
+				e.stopPropagation();
+			},
+
+			register_move : (e) => {
+				SE.mouse.button = e.button;
+				SE.mouse.x = e.clientX;
+				SE.mouse.y = e.clientY;
+				SE.mouse.cx = e.offsetX;
+				SE.mouse.cy = e.offsetY;
+				if(SE.mouse.down && SE.mouse.drag_mode)
+					SE.mouse.drag_mode(e);
+			},
+
+		},
+
+	}
+
+	if(!document.graphedit) {
+		document.graphedit = {
+			element_counter : 1000,
+		}
+	}
+
+	document.graphedit.element_counter += 1;
+	SE.element_number = document.graphedit.element_counter;
+	init_opt.edit_name = 'ge'+SE.element_number;
+	SE.edit_name = 'document.graphedit.'+init_opt.edit_name;
+	document.graphedit[init_opt.edit_name] = SE;
+
+	if(init_opt.size)
+		SE.canvas.size = init_opt.size;
+
+	if(init_opt.node_types)
+		SE.node_types = init_opt.node_types;
+
+	each(SE, (v, k) => {
+		this[k] = v;
+	});
+
+	init_opt.container.html('<div class="graphedit-canvas" id="graphedit-canvas-'+SE.element_number+'" '+
+		'	onmousemove="'+SE.edit_name+'.canvas.mousemove(event);" '+
+		'	onmousedown="'+SE.edit_name+'.canvas.mousedown(event);" '+
+		'	onmouseup="'+SE.edit_name+'.canvas.mouseup(event);"> '+
+		'</div>');
+
+	SE.canvas.element = $('#graphedit-canvas-'+SE.element_number);
+
+	SE.init();
+
+	var toolbar_template = Minibars.compile($('#t-toolbaritems').html());
+
+	init_opt.toolbar.html(toolbar_template(SE));
+
+}
+
+</script>
+<div style="width: 100vw; height: 100vh;"
+	class="graphedit-container" id="graphedit-1">
+
+</div>
+<div id="graphedit-tool-menu">
+
+</div>
+<script>
+
+var GED = new GraphEdit({
+	toolbar : $('#graphedit-tool-menu'),
+	container : $('#graphedit-1'),
+	size : 4000,
+	node_types : {
+
+		ex_src : {
+			init : {
+				title : 'Source', class : 'event',
+				params : {
+					out0 : { c : 'output', title : 'output', type : 'text' },
+				},
+			},
+		},
+
+		ex_inter : {
+			init : {
+				title : 'Inter', class : 'flow',
+				params : {
+					in0 : { c : 'input', title : 'value A', type : 'text' },
+					op0 : { c : 'proc', title : 'operation', type : 'option' },
+					in1 : { c : 'input', title : 'value B', type : 'text' },
+					then0 : { c : 'output', title : 'then', type : 'flow' },
+					else0 : { c : 'output', title : 'else', type : 'flow' },
+				},
+			},
+		},
+
+		ex_dest : {
+			init : {
+				title : 'Dest', class : 'flow',
+				params : {
+					in0 : { c : 'input', title : 'execute', type : 'any' },
+				},
+			},
+		},
+
+
+	},
+});
+
+</script>
 
 </html>

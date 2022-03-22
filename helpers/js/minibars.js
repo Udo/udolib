@@ -7,10 +7,10 @@ String.prototype.replaceAll = function(search, replacement) {
 };
 
 var _m = {
-  
+
   scope : 'data',
   stack : [],
-  
+
   tokenize : function(text) {
     var tokens = [];
     for(var i = 0; i < text.length; i++) {
@@ -18,7 +18,7 @@ var _m = {
       if(tkPos === -1) {
         tokens.push({ type : 'text', val : text.slice(i) });
         i = text.length;
-      } 
+      }
       else {
         var rawField = text.substr(tkPos, 3) == '{{{';
         var closeBy = '}}' + (rawField ? '}' : '');
@@ -29,13 +29,13 @@ var _m = {
         } else {
           if(i < tkPos)
             tokens.push({ type : 'text', val : text.slice(i, tkPos) });
-            
-          var token = { 
-            type : 'field', 
-            raw : rawField, 
-            val : text.slice(tkPos+closeBy.length, tkEnd), 
+
+          var token = {
+            type : 'field',
+            raw : rawField,
+            val : text.slice(tkPos+closeBy.length, tkEnd),
             };
-            
+
           var delimHS = token.val.indexOf(' ');
           if(delimHS !== -1) {
             token.params = token.val.slice(delimHS+1);
@@ -56,7 +56,7 @@ var _m = {
             token.block = 'end';
             token.val = token.val.slice(1);
           }
-          
+
           tokens.push(token);
           i = tkEnd + closeBy.length - 1;
         }
@@ -64,23 +64,23 @@ var _m = {
     }
     return(tokens);
   },
-  
+
   utils : {
-    
+
     vnCounter : 0,
     getName : function() {
       return('v'+_m.utils.vnCounter++);
     },
-      
+
     safe : function(raw) {
       if(raw == null) raw = '';
       return((raw +'').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;'));
     },
-    
+
     unsafe : function(raw) {
       return(raw || '');
     },
-    
+
     // resolve field from label at compile time
     field : function(label) {
       label = (label || '').trim();
@@ -92,7 +92,7 @@ var _m = {
       while(label[0] == '.') {
         // access parent scopes with ..
         if(upCnt > 0 && _m.stack.length >= upCnt) {
-          scope = _m.stack[_m.stack.length-upCnt];                    
+          scope = _m.stack[_m.stack.length-upCnt];
         }
         upCnt++;
         label = label.slice(1);
@@ -102,42 +102,42 @@ var _m = {
       levels.forEach(function(fn) {
         if(fn[0] == '/') fn = fn.slice(1);
         acc += '['+JSON.stringify(fn)+']';
-      });      
+      });
       return(scope+acc);
     },
-    
+
     pushScope : function() {
       _m.stack.push(_m.scope);
       _m.scope = _m.utils.getName();
       return(_m.scope);
     },
-    
+
     popScope : function() {
       _m.scope = _m.stack.pop() || 'data';
       return(_m.scope);
     },
-    
+
   },
-  
+
   // code generators
   gen : {
-    
+
     if_start : function(token) {
       return('if('+_m.utils.field(token.params.trim())+') {');
     },
-    
+
     if_end : function(token) {
       return('}');
     },
-    
+
     unless_start : function(token) {
       return('if(!'+_m.utils.field(token.params.trim())+') {');
     },
-    
+
     unless_end : function(token) {
       return('}');
     },
-    
+
     each_start : function(token) {
       var container = _m.utils.field(token.params.trim());
       var iterVN = _m.utils.getName();
@@ -148,12 +148,12 @@ var _m = {
         'var index='+iterVN+';'+
         'var '+scp+'='+container+'['+iterVN+'];');
     },
-    
+
     each_end : function(token) {
       _m.utils.popScope();
       return('}');
     },
-    
+
     local_mapping : function(token, tm) {
       if(token.mapTo && token.mapTo.length > 0) {
         var mapCode = '';
@@ -161,14 +161,14 @@ var _m = {
           var alias = token.mapTo[i];
           var v = tm[i];
           if(alias && v)
-            mapCode += 'var '+alias+' = '+v+';'; 
+            mapCode += 'var '+alias+' = '+v+';';
         }
         return(mapCode);
       } else {
         return('');
       }
     },
-    
+
     properties_start : function(token) {
       var container = _m.utils.field(token.params.trim());
       var iterVN = _m.utils.getName();
@@ -183,12 +183,12 @@ var _m = {
         'var '+scp+'='+container+'[key];'+
         _m.gen.local_mapping(token, [scp, 'key']));
     },
-    
+
     properties_end : function(token) {
       _m.utils.popScope();
       return('}');
     },
-    
+
     with_start : function(token) {
       var container = _m.utils.field(token.params.trim());
       var scp = _m.utils.pushScope();
@@ -197,31 +197,31 @@ var _m = {
         'var '+scp+'='+container+';'+
         _m.gen.local_mapping(token, [scp]));
     },
-    
+
     with_end : function(token) {
       _m.utils.popScope();
       return('}');
     },
-    
+
     'else' : function(token) {
       return('} else {');
     },
-    
+
     log : function(token) {
-      return('console.log(_m.utils.safe('+_m.utils.field(token.params)+'));');
+      return('console.log('+_m.utils.field(token.params)+');');
     },
-    
+
     _text_f : function(token) {
       return('o += '+JSON.stringify(_m.opt.trim ? token.val.trim() : token.val)+';');
     },
-    
+
     _invoke_synth : function(ct, token) {
       return('o += _m.utils.'+
         (token.raw ? 'unsafe' : 'safe')+
         '('+ct+'['+JSON.stringify(token.val)+']('+_m.utils.field(token.params || 'this')+
         ', '+_m.utils.field('this')+', '+JSON.stringify(token.params)+', data));');
     },
-    
+
     _field_f : function(token, opt) {
       if(token.block == 'start' || token.block == 'end') {
         var genKey = token.val+'_'+token.block;
@@ -242,12 +242,12 @@ var _m = {
           '('+_m.utils.field(token.val)+');');
       }
     },
-    
+
   },
-  
+
   tokensToCode : function(tokens, opt) {
     var code = [];
-    
+
     tokens.forEach(function(t) {
       var handler = _m.gen['_'+t.type+'_f'];
       if(typeof handler != 'function')
@@ -255,10 +255,10 @@ var _m = {
       else
         code.push(handler(t, opt));
     });
-    
+
     return(code.join("\n"));
   },
-  
+
   compile : function(text, opt) {
     if(!opt) opt = {};
     _m.opt = opt;
@@ -270,13 +270,13 @@ var _m = {
     if(_m.stack.length != 0) {
       var e = function() { return('template error: un-closed blocks'); };
       e.error = e();
-      return(e);      
+      return(e);
     } else {
       // straight-up string concat seems to be the fastest option
       return(eval('(function(data) { "use strict"; if(!data) data = {}; var o = ""; '+code+' return(o); })'));
     }
   },
-  
+
 }
 
 var Minibars = _m;
